@@ -39,7 +39,6 @@ export function planActions(ctx: HouseholdContext, level: Level | null, window: 
 
   const score = (action: Action): number => {
     let s = ctx.lowBudget ? COST_FIT[action.cost] : 0;
-    if (effective >= EXPOSURE_FIRST_LEVEL && action.impact.exposure !== undefined) s += 100;
     if (action.when.requires?.some((f) => f !== "betterWindow")) s += 10;
     return s;
   };
@@ -53,6 +52,10 @@ export function planActions(ctx: HouseholdContext, level: Level | null, window: 
     .map((a, index) => ({ a, index, s: score(a) }))
     .sort((x, y) => y.s - x.s || x.index - y.index)
     .map((x) => x.a);
+
+  // At high levels one exposure action leads; the rest of the plan follows the household's routine.
+  const lead = effective >= EXPOSURE_FIRST_LEVEL ? ranked.findIndex((a) => a.impact.exposure !== undefined) : -1;
+  if (lead > 0) ranked.unshift(...ranked.splice(lead, 1));
 
   const picked = new Set<Action>();
   for (const needs of ["indoor", "emissions"] as const) {

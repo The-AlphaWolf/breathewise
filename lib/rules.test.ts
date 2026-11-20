@@ -73,6 +73,17 @@ test("top 3 always include one indoor and one emissions action", () => {
   }
 });
 
+test("transit swap makes no exposure claim, so it never leads at high levels", () => {
+  const top = planActions({ ...base, hasTransit: true }, 4, null).top;
+  assert.equal(top[0].id === "transit-swap", false);
+  assert.equal(top.find((a) => a.id === "transit-swap")?.impact.exposure, undefined);
+});
+
+test("a stated routine shows up in the top 3 even at severe levels", () => {
+  const top = planActions({ ...base, extraCaution: true, schoolRun: true }, 4, null).top.map((a) => a.id);
+  assert.ok(top.includes("school-run-combine"), top.join());
+});
+
 test("at high levels the first card is an exposure action", () => {
   assert.ok(planActions(base, 4, null).top[0].impact.exposure !== undefined);
 });

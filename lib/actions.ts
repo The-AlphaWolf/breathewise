@@ -65,10 +65,7 @@ export const ACTIONS: readonly Action[] = [
     why: "Sharing a vehicle or using mass transit spreads the same trip's emissions over more people.",
     fallback: "If the timing does not work, combine errands into one trip instead.",
     assumption: "Transit is not automatically lower exposure: platforms and busy roads can be polluted too.",
-    impact: {
-      emissions: "Lower household transport emissions for that trip.",
-      exposure: "No exposure benefit is claimed; it depends on route and waiting time.",
-    },
+    impact: { emissions: "Lower household transport emissions for that trip. No exposure benefit is claimed." },
     when: { requires: ["hasTransit"], excludes: ["mustDrive"] },
     slot: "morning", cost: "low", scope: "household",
   },
