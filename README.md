@@ -8,7 +8,7 @@ Urban air quality for families and communities. Persona: Priya, a working parent
 
 ## What it does
 
-A one-page, mobile-first assistant. You pick a city and a few routine facts (no account, address or diagnosis). It shows labelled air context and a ranked plan of three actions: lower-exposure choices, lower-emission routines and indoor-air hacks. Each action says what it changes (exposure, emissions, indoor air) separately. A Gemini-backed explanation tailors the "why" to your household.
+A one-page, mobile-first assistant. You pick a city and a few routine facts (no account, address or diagnosis). It shows labelled air context and a ranked plan of three actions: lower-exposure choices, lower-emission routines and indoor-air hacks. Each action says what it changes (exposure, emissions, indoor air) separately. A Gemini-backed explanation tailors the "why" to your household. Extras: a ready-to-send community message built from the approved community actions, an opt-in "My current location" option, and an illustrative per-trip emissions estimate with its factors shown.
 
 ## How it works
 
@@ -41,15 +41,18 @@ The plan is computed in the browser by the same pure code the server uses to val
 
 - Live: [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) (CAMS ENSEMBLE, CC BY 4.0). Labelled "area-level model forecast", "US AQI", never the Indian National AQI and never a station reading. Source time is shown in IST with freshness; older than 3 hours shows a stale banner.
 - Demo mode: three fixed fixtures (severe, moderate, improving) with hourly series, behind an explicit toggle and persistent banner. A provider failure shows an error and an offer to switch; it never silently swaps to demo data.
+- "My current location" is opt-in browser geolocation. Coordinates are validated to an India bounding box, rounded to 2 decimals (~1 km), used for one Open-Meteo request, never stored, and never sent to the model (it only sees "Your location (approx.)").
 - Cities are a preset list (Delhi NCR, Lucknow, Kanpur, Patna, Kolkata, Mumbai) validated against an allow-list.
 
 ## Impact methodology
 
-Impact is qualitative by design. Exposure, household-emissions and indoor-air effects are separate lines per action; transit and carpooling claim emissions benefits only. No numeric emission or health claims are made.
+Impact is qualitative by design, with one clearly labelled exception: an optional illustrative estimator multiplies km × avoided trips × a visible factor (0.12 kg CO₂/km petrol car, 0.04 kg CO₂/km two-wheeler), rounded from ICCT India fleet averages ([two-wheelers](https://theicct.org/sites/default/files/publications/fuel-consumption-2w-india-aug2021.pdf), [passenger cars](https://theicct.org/publications/fuel-consumption-lvs-india-dec21)). Tailpipe CO₂ only; no particulate, life-cycle or traffic effects. It is never presented as a health or exposure benefit.
+
+Otherwise impact is qualitative. Exposure, household-emissions and indoor-air effects are separate lines per action; transit and carpooling claim emissions benefits only. No numeric emission or health claims are made.
 
 ## Security and privacy
 
-Keys are server-side only (`.env.local`, names listed in `.env.example`). Zod validates every request, upstream response and model response. City allow-list; rate limit, body-size limit and timeout on `/api/plan`. No profile or question is stored or logged. Security headers (CSP with same-origin connections, `nosniff`, referrer policy) are set in `next.config.ts`.
+Keys are server-side only (`.env.local`, names listed in `.env.example`). Zod validates every request, upstream response and model response. City allow-list; rate limit, body-size limit and timeout on `/api/plan`. No profile or question is stored or logged. Security headers (CSP with same-origin connections, `nosniff`, referrer policy, permissions policy limiting geolocation to this site) are set in `next.config.ts`.
 
 ## Accessibility
 
@@ -64,9 +67,9 @@ npm run typecheck
 npm run build
 ```
 
-Covered: AQI boundaries and extra caution, rules gating/ranking and the top-3 invariant over every context × level × window combination, better-window logic, timestamp/freshness, demo fixtures, and the AI validator (unknown ids, duplicates, coverage, length caps, URL/HTML rejection, injection question).
+Covered: AQI boundaries and extra caution, rules gating/ranking and the top-3 invariant over every context × level × window combination, better-window logic, timestamp/freshness, demo fixtures, coordinate validation, the emissions estimator, the community message, and the AI validator (unknown ids, duplicates, coverage, length caps, URL/HTML rejection, injection question).
 
-Manual checks: demo banner visible, provider-down error path, AI-unavailable fallback (run without a key), keyboard-only run-through.
+Manual checks: demo banner visible, location permission prompt (browser-dependent), provider-down error path, AI-unavailable fallback (run without a key), keyboard-only run-through.
 
 ## Setup
 

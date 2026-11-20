@@ -1,16 +1,21 @@
 import { AirError, fetchLiveAir } from "../../../lib/air-server.ts";
 import { cityById } from "../../../lib/cities.ts";
+import { parseCoords } from "../../../lib/geo.ts";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  const city = new URL(request.url).searchParams.get("city") ?? "delhi-ncr";
-  if (cityById(city) === undefined) {
-    return Response.json({ error: "Unknown city." }, { status: 400 });
+  const params = new URL(request.url).searchParams;
+  const wantsCoords = params.has("lat") || params.has("lon");
+  const coords = wantsCoords ? parseCoords(params.get("lat"), params.get("lon")) : null;
+  const city = params.get("city") ?? "delhi-ncr";
+
+  if (wantsCoords ? coords === null : cityById(city) === undefined) {
+    return Response.json({ error: wantsCoords ? "Location is outside the supported area." : "Unknown city." }, { status: 400 });
   }
 
   try {
-    return Response.json(await fetchLiveAir(city), {
+    return Response.json(await fetchLiveAir(coords ?? city), {
       headers: { "Cache-Control": "public, s-maxage=600, stale-while-revalidate=300" },
     });
   } catch (error) {

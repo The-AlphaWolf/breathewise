@@ -4,14 +4,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { actionById } from "../lib/actions.ts";
 import type { AiOutput } from "../lib/ai.ts";
 import { type AirSnapshot, airSnapshotSchema } from "../lib/air.ts";
-import { aqiLevel } from "../lib/aqi.ts";
+import { aqiLevel, LEVEL_LABELS } from "../lib/aqi.ts";
 import { DEMO_SCENARIOS, type DemoId } from "../lib/demo.ts";
+import { parseCoords } from "../lib/geo.ts";
 import { fallbackAnswer, type QuestionId, questionById } from "../lib/questions.ts";
 import { type HouseholdContext, planActions } from "../lib/rules.ts";
+import { buildCommunityMessage } from "../lib/share.ts";
 import { findBetterWindow } from "../lib/window.ts";
 import { AirCard } from "./air-card.tsx";
 import { AskPanel, type AskView } from "./ask-panel.tsx";
 import { type Mode, ContextForm } from "./context-form.tsx";
+import { CommunityShare, EmissionsEstimate } from "./extras.tsx";
 import { PlanSection } from "./plan-section.tsx";
 
 const DEFAULT_CONTEXT: HouseholdContext = {
@@ -25,8 +28,13 @@ type AiState =
   | { readonly key: string; readonly status: "ok"; readonly ai: AiOutput }
   | { readonly key: string; readonly status: "unavailable"; readonly message: string };
 
-async function loadLive(cityId: string, signal: AbortSignal): Promise<AirSnapshot> {
-  const response = await fetch(`/api/air-quality?city=${encodeURIComponent(cityId)}`, { signal });
+type Coords = { readonly lat: number; readonly lon: number };
+
+async function loadLive(cityId: string, coords: Coords | null, signal: AbortSignal): Promise<AirSnapshot> {
+  const url = cityId === "here" && coords !== null
+    ? `/api/air-quality?lat=${coords.lat}&lon=${coords.lon}`
+    : `/api/air-quality?city=${encodeURIComponent(cityId)}`;
+  const response = await fetch(url, { signal });
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const message = (payload as { error?: unknown } | null)?.error;
@@ -39,6 +47,8 @@ async function loadLive(cityId: string, signal: AbortSignal): Promise<AirSnapsho
 
 export function BreatheWisePlanner() {
   const [cityId, setCityId] = useState("delhi-ncr");
+  const [coords, setCoords] = useState<Coords | null>(null);
+  const [geoError, setGeoError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("live");
   const [demoId, setDemoId] = useState<DemoId>("severe");
   const [ctx, setCtx] = useState<HouseholdContext>(DEFAULT_CONTEXT);
@@ -58,7 +68,7 @@ export function BreatheWisePlanner() {
     setLoading(true);
     setLiveError(null);
     setLive(null);
-    loadLive(cityId, controller.signal)
+    loadLive(cityId, coords, controller.signal)
       .then((snapshot) => { setLive(snapshot); setNow(Date.now()); })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
@@ -66,7 +76,7 @@ export function BreatheWisePlanner() {
       })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [mode, cityId, reload]);
+  }, [mode, cityId, coords, reload]);
 
   const air = mode === "demo" ? DEMO_SCENARIOS[demoId].snapshot : live;
   const level = air === null ? null : aqiLevel(air.usAqi);
@@ -74,7 +84,7 @@ export function BreatheWisePlanner() {
   const plan = useMemo(() => planActions(ctx, level, window), [ctx, level, window]);
 
   // An AI answer belongs to one exact (source, household, question) combination.
-  const currentKey = JSON.stringify([mode, mode === "demo" ? demoId : cityId, ctx, questionText]);
+  const currentKey = JSON.stringify([mode, mode === "demo" ? demoId : cityId, coords, ctx, questionText]);
   const currentAi = aiState !== null && aiState.key === currentKey ? aiState : null;
 
   const shownTop = useMemo(() => {
@@ -87,6 +97,31 @@ export function BreatheWisePlanner() {
     () => new Map(currentAi?.status === "ok" ? currentAi.ai.perAction.map((p) => [p.id, p.whyForYou]) : []),
     [currentAi],
   );
+
+  function chooseCity(id: string) {
+    setGeoError(null);
+    if (id !== "here") {
+      setCityId(id);
+      return;
+    }
+    if (!("geolocation" in navigator)) {
+      setGeoError("Location is not available in this browser. Choose a city instead.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const point = parseCoords(position.coords.latitude, position.coords.longitude);
+        if (point === null) {
+          setGeoError("Your location is outside the supported area (India). Choose a city instead.");
+          return;
+        }
+        setCoords(point);
+        setCityId("here");
+      },
+      () => setGeoError("Location permission was not granted. Choose a city instead."),
+      { timeout: 10_000, maximumAge: 600_000 },
+    );
+  }
 
   async function ask() {
     if (air === null) return;
@@ -103,7 +138,10 @@ export function BreatheWisePlanner() {
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
-          source: mode === "demo" ? { mode, scenarioId: demoId } : { mode, cityId },
+          source:
+            mode === "demo" ? { mode, scenarioId: demoId }
+            : cityId === "here" && coords !== null ? { mode: "here", lat: coords.lat, lon: coords.lon }
+            : { mode, cityId },
           context: ctx,
           question: questionText,
         }),
@@ -154,7 +192,7 @@ export function BreatheWisePlanner() {
         </section>
 
         <ContextForm
-          cityId={cityId} onCity={setCityId} mode={mode} onMode={setMode}
+          cityId={cityId} onCity={chooseCity} geoError={geoError} mode={mode} onMode={setMode}
           demoId={demoId} onDemo={setDemoId} ctx={ctx} onCtx={setCtx}
         />
 
@@ -182,6 +220,17 @@ export function BreatheWisePlanner() {
             {mode === "live" && loading ? "Your plan appears once the air data loads." : "Switch to demo data to see a sample plan."}
           </p>
         )}
+
+        {air !== null ? (
+          <CommunityShare
+            message={buildCommunityMessage(
+              air.locationLabel,
+              level === null ? "unavailable" : LEVEL_LABELS[level],
+              [...plan.top, ...plan.more],
+            )}
+          />
+        ) : null}
+        <EmissionsEstimate />
 
         <AskPanel
           text={questionText} questionId={questionId}

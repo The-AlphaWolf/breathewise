@@ -6,7 +6,8 @@ import { type AirSnapshot } from "../../../lib/air.ts";
 import { AirError, fetchLiveAir } from "../../../lib/air-server.ts";
 import { aqiLevel, LEVEL_LABELS } from "../../../lib/aqi.ts";
 import { CITY_IDS } from "../../../lib/cities.ts";
-import { DEMO_IDS, DEMO_SCENARIOS } from "../../../lib/demo.ts";
+import { parseCoords } from "../../../lib/geo.ts";
+import { DEMO_IDS, DEMO_SCENARIOS, type DemoId } from "../../../lib/demo.ts";
 import { rateLimited } from "../../../lib/rate-limit.ts";
 import { contextSchema, planActions } from "../../../lib/rules.ts";
 import { findBetterWindow } from "../../../lib/window.ts";
@@ -21,6 +22,7 @@ const MODEL_TIMEOUT_MS = 12_000;
 const requestSchema = z.object({
   source: z.discriminatedUnion("mode", [
     z.object({ mode: z.literal("live"), cityId: z.enum(CITY_IDS) }),
+    z.object({ mode: z.literal("here"), lat: z.number(), lon: z.number() }),
     z.object({ mode: z.literal("demo"), scenarioId: z.enum(DEMO_IDS as [string, ...string[]]) }),
   ]),
   context: contextSchema,
@@ -50,9 +52,15 @@ export async function POST(request: Request) {
 
   let air: AirSnapshot;
   try {
-    air = source.mode === "live"
-      ? await fetchLiveAir(source.cityId)
-      : DEMO_SCENARIOS[source.scenarioId as keyof typeof DEMO_SCENARIOS].snapshot;
+    if (source.mode === "demo") {
+      air = DEMO_SCENARIOS[source.scenarioId as DemoId].snapshot;
+    } else if (source.mode === "here") {
+      const here = parseCoords(source.lat, source.lon);
+      if (here === null) return fail(400, "Invalid request.");
+      air = await fetchLiveAir(here);
+    } else {
+      air = await fetchLiveAir(source.cityId);
+    }
   } catch (error) {
     return fail(error instanceof AirError ? error.status : 503, "Air data is unavailable.");
   }

@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Content-Security-Policy", value: csp },
           { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Permissions-Policy", value: "geolocation=(self), camera=(), microphone=()" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },

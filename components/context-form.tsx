@@ -9,6 +9,7 @@ export type Mode = "live" | "demo";
 type Props = {
   readonly cityId: string;
   readonly onCity: (id: string) => void;
+  readonly geoError: string | null;
   readonly mode: Mode;
   readonly onMode: (mode: Mode) => void;
   readonly demoId: DemoId;
@@ -27,7 +28,7 @@ const TOGGLES: readonly { key: keyof HouseholdContext; label: string }[] = [
   { key: "ownsPurifier", label: "We own an air purifier" },
 ];
 
-export function ContextForm({ cityId, onCity, mode, onMode, demoId, onDemo, ctx, onCtx }: Props) {
+export function ContextForm({ cityId, onCity, geoError, mode, onMode, demoId, onDemo, ctx, onCtx }: Props) {
   return (
     <section className="setup-panel" aria-labelledby="setup-title">
       <div>
@@ -40,7 +41,12 @@ export function ContextForm({ cityId, onCity, mode, onMode, demoId, onDemo, ctx,
           <label htmlFor="city">City</label>
           <select id="city" value={cityId} disabled={mode === "demo"} onChange={(e) => onCity(e.target.value)}>
             {CITIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            <option value="here">My current location (approximate)</option>
           </select>
+          {cityId === "here" ? (
+            <p className="field-hint">Rounded to about 1 km, used only for this request and not stored.</p>
+          ) : null}
+          {geoError !== null ? <p className="model-error" role="alert">{geoError}</p> : null}
           {mode === "demo" ? <p className="field-hint">Demo scenarios use Delhi NCR.</p> : null}
         </div>
 

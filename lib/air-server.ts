@@ -18,14 +18,19 @@ const upstreamSchema = z.object({
 
 const clean = (v: number | null | undefined) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
+export type LiveTarget = string | { readonly lat: number; readonly lon: number };
+
 /** One Open-Meteo request: current values plus the next 12 hourly US AQI values. */
-export async function fetchLiveAir(cityId: string): Promise<AirSnapshot> {
-  const city = cityById(cityId);
-  if (city === undefined) throw new AirError("Unknown city.", 400);
+export async function fetchLiveAir(target: LiveTarget): Promise<AirSnapshot> {
+  const place =
+    typeof target === "string"
+      ? cityById(target)
+      : { id: "here", label: "Your location (approx.)", latitude: target.lat, longitude: target.lon };
+  if (place === undefined) throw new AirError("Unknown city.", 400);
 
   const query = new URLSearchParams({
-    latitude: String(city.latitude),
-    longitude: String(city.longitude),
+    latitude: String(place.latitude),
+    longitude: String(place.longitude),
     current: "pm2_5,pm10,us_aqi",
     hourly: "us_aqi",
     forecast_hours: "12",
@@ -49,8 +54,8 @@ export async function fetchLiveAir(cityId: string): Promise<AirSnapshot> {
   const { current, hourly } = parsed.data;
   return {
     mode: "live",
-    cityId: city.id,
-    locationLabel: city.label,
+    cityId: place.id,
+    locationLabel: place.label,
     sourceName: "Open-Meteo / CAMS model forecast",
     sourceType: "model",
     indexSystem: "US AQI",
