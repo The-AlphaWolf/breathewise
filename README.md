@@ -1,5 +1,7 @@
 # BreatheWise — Challenge 6: Urban Air Quality Assistant
 
+**Live demo:** https://breathewise-three.vercel.app/
+
 ## Chosen vertical and persona
 
 Urban air quality for families and communities. Persona: Priya, a working parent in Delhi NCR with a school-age child, an 11 km commute, scooter and metro access, and a modest budget. On a severe-smog morning she needs realistic decisions about the school run, commute, cooking, waste and indoor time.
