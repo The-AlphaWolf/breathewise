@@ -2,25 +2,16 @@
   "name": "breathewise",
   "version": "0.0.0",
   "type": "module",
-  "imports": {
-    "#*": "./agent/*",
-    "#evals/*": "./evals/*"
-  },
   "scripts": {
-    "build": "eve build",
-    "build:web": "next build",
-    "deploy": "eve deploy",
-    "dev": "eve dev",
-    "dev:web": "next dev",
-    "eval": "eve eval",
-    "start": "eve start",
-    "start:web": "next start",
-    "typecheck": "tsc"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"lib/**/*.test.ts\" \"app/**/*.test.ts\""
   },
   "dependencies": {
-    "@vercel/connect": "2.7.0",
+    "@ai-sdk/google": "^4.0.122",
     "ai": "^7.0.172",
-    "eve": "^1.1.0",
     "next": "^16.4.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -33,6 +24,6 @@
     "typescript": "7.0.2"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   }
 }
