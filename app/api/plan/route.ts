@@ -12,6 +12,7 @@ import { contextSchema, planActions } from "../../../lib/rules.ts";
 import { findBetterWindow } from "../../../lib/window.ts";
 
 export const runtime = "nodejs";
+export const maxDuration = 30; // seconds; the model call itself is capped at 12 s
 
 const GEMINI_MODEL = "gemini-3.1-flash-lite";
 const MAX_BODY_BYTES = 4_096;
