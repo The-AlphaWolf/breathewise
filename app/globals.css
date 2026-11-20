@@ -16,8 +16,10 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -28,12 +30,17 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
 button:focus-visible,
 input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
 a:focus-visible {
   outline: 3px solid #f39a35;
   outline-offset: 3px;
@@ -546,4 +553,109 @@ legend {
   .source-list div {
     grid-template-columns: 1fr;
   }
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  font-weight: 800;
+}
+
+.field select,
+.field textarea {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  min-height: 44px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.field-hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.stale-banner {
+  background: #fff2cf;
+  border-radius: 10px;
+  color: #76520c;
+  font-weight: 700;
+  padding: 10px 12px;
+}
+
+ol.recommendation-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recommendation-grid > li {
+  display: flex;
+}
+
+.recommendation-grid > li > article {
+  flex: 1;
+}
+
+.impact-list {
+  color: #3b4d67;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 11px;
+  padding-left: 18px;
+}
+
+.why-for-you {
+  background: var(--blue-soft);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.more-options {
+  margin-top: 16px;
+}
+
+.more-options summary {
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 44px;
+  padding: 10px 0;
+}
+
+.more-options li {
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 20px 24px 40px;
+}
+
+.site-footer a {
+  color: var(--blue);
+}
+
+.toggle-row,
+.choice,
+.question-button,
+.ai-button,
+.model-button {
+  min-height: 44px;
+}
+
+.toggle-row input,
+.choice input {
+  height: 22px;
+  width: 22px;
 }
