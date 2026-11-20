@@ -81,7 +81,7 @@ Without a key everything works except the AI explanation, which falls back to th
 ## Assumptions and limitations
 
 - Air data is an area-level model forecast, not a station reading; street-level air differs. CPCB station data is not used.
-- The model id (`gemini-3.5-flash`) is a constant in `app/api/plan/route.ts`.
+- The model id (`gemini-3.1-flash-lite`) is a constant in `app/api/plan/route.ts`.
 - The rate limiter is per server instance and resets on restart.
 - Validator blocks links and markup but does not fact-check numbers in model prose; the system prompt forbids new numbers and cards are always rendered from the approved catalogue.
 - English only; general information, not medical advice. Official local alerts take precedence.

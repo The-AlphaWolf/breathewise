@@ -50,8 +50,12 @@ test("a ranking with no lower-emissions action is rejected", () => {
 });
 
 test("over-length text is rejected", () => {
-  assert.equal(check({ ...good, summary: "x".repeat(401) }).ok, false);
-  assert.equal(check({ ...good, answer: "x".repeat(601) }).ok, false);
+  assert.equal(check({ ...good, summary: "x".repeat(501) }).ok, false);
+  assert.equal(check({ ...good, answer: "x".repeat(801) }).ok, false);
+});
+
+test("text at the hard caps is accepted", () => {
+  assert.equal(check({ ...good, summary: "x".repeat(500), answer: "x".repeat(800) }).ok, true);
 });
 
 test("URLs, HTML and markdown links are rejected", () => {

@@ -13,9 +13,9 @@ import { findBetterWindow } from "../../../lib/window.ts";
 
 export const runtime = "nodejs";
 
-const GEMINI_MODEL = "gemini-3.5-flash";
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
 const MAX_BODY_BYTES = 4_096;
-const MODEL_TIMEOUT_MS = 10_000;
+const MODEL_TIMEOUT_MS = 12_000;
 
 const requestSchema = z.object({
   source: z.discriminatedUnion("mode", [
@@ -61,11 +61,13 @@ export async function POST(request: Request) {
   const plan = planActions(context, level, window);
   const approved = new Set([...plan.top, ...plan.more].map((a) => a.id));
 
+  const started = Date.now();
   try {
     const { output } = await generateText({
       model: google(GEMINI_MODEL),
       output: Output.object({ schema: aiOutputSchema }),
       temperature: 0.2,
+      providerOptions: { google: { thinkingConfig: { thinkingLevel: "low" } } },
       abortSignal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
       system: SYSTEM_PROMPT,
       prompt: buildPrompt({
@@ -81,7 +83,8 @@ export async function POST(request: Request) {
     const checked = validateAiOutput(output, approved);
     if (!checked.ok) return fail(502, "AI explanation did not pass validation.");
     return Response.json({ ai: checked.value });
-  } catch {
+  } catch (error) {
+    console.error("[plan] model call failed after", Date.now() - started, "ms:", error instanceof Error ? error.message : "unknown error");
     return fail(502, "AI explanation is temporarily unavailable.");
   }
 }
