@@ -7,7 +7,7 @@ function hourly(startHour: number, values: (number | null)[]) {
 }
 
 function fixture(
-  id: DemoId, label: string, startHour: number, values: number[], pm25: number, pm10: number, caveat: string,
+  label: string, startHour: number, values: number[], pm25: number, pm10: number, caveat: string,
 ): { label: string; snapshot: AirSnapshot } {
   return {
     label,
@@ -30,15 +30,15 @@ function fixture(
 }
 
 export const DEMO_SCENARIOS: Record<DemoId, { label: string; snapshot: AirSnapshot }> = {
-  severe: fixture("severe", "Severe smog morning", 8,
+  severe: fixture("Severe smog morning", 8,
     [320, 330, 335, 330, 325, 320, 318, 310, 305, 300, 302, 310], 280, 400,
     "Fixed data for demonstration. It is not a live reading."),
-  moderate: fixture("moderate", "Moderate conditions", 12,
+  moderate: fixture("Moderate conditions", 12,
     [85, 90, 95, 90, 80, 70, 60, 55, 58, 65, 75, 80], 30, 70,
     "Fixed data for demonstration. Check official local alerts before making health decisions."),
-  improving: fixture("improving", "Improving afternoon", 16,
+  improving: fixture("Improving afternoon", 16,
     [160, 150, 130, 110, 95, 85, 80, 78, 80, 85, 95, 110], 70, 120,
     "Fixed data for demonstration. A forecast is not a guarantee of street-level conditions."),
 };
 
-export const DEMO_IDS = Object.keys(DEMO_SCENARIOS) as DemoId[];
+export const DEMO_IDS = Object.keys(DEMO_SCENARIOS) as [DemoId, ...DemoId[]];

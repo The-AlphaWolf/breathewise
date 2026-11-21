@@ -2,8 +2,6 @@ import { AirError, fetchLiveAir } from "../../../lib/air-server.ts";
 import { cityById } from "../../../lib/cities.ts";
 import { parseCoords } from "../../../lib/geo.ts";
 
-export const runtime = "nodejs";
-
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const wantsCoords = params.has("lat") || params.has("lon");

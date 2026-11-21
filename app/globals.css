@@ -265,24 +265,6 @@ legend {
   line-height: 1.55;
 }
 
-.severity-dot {
-  border-radius: 50%;
-  height: 28px;
-  width: 28px;
-}
-
-.severity-dot.severe {
-  background: var(--rose);
-}
-
-.severity-dot.moderate {
-  background: var(--amber);
-}
-
-.severity-dot.improving {
-  background: var(--teal);
-}
-
 .source-list {
   border-top: 1px solid var(--line);
   display: grid;
@@ -329,12 +311,6 @@ legend {
   font-size: 0.88rem;
   line-height: 1.45;
   margin-bottom: 0;
-}
-
-.model-note {
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.45;
 }
 
 .trust-card {
@@ -406,12 +382,6 @@ legend {
   font-size: 0.72rem;
   font-weight: 800;
   padding: 6px 9px;
-}
-
-.checkmark {
-  color: var(--teal);
-  font-size: 1.2rem;
-  font-weight: 900;
 }
 
 .recommendation-card h3 {

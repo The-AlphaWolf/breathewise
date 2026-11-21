@@ -7,7 +7,7 @@ import { type AirSnapshot, airSnapshotSchema } from "../lib/air.ts";
 import { aqiLevel, LEVEL_LABELS } from "../lib/aqi.ts";
 import { DEMO_SCENARIOS, type DemoId } from "../lib/demo.ts";
 import { parseCoords } from "../lib/geo.ts";
-import { fallbackAnswer, type QuestionId, questionById } from "../lib/questions.ts";
+import { fallbackAnswer, type QuestionId } from "../lib/questions.ts";
 import { type HouseholdContext, planActions } from "../lib/rules.ts";
 import { buildCommunityMessage } from "../lib/share.ts";
 import { findBetterWindow } from "../lib/window.ts";
@@ -169,7 +169,7 @@ export function BreatheWisePlanner() {
     : {
         status: "unavailable",
         message: currentAi.message,
-        fallback: questionId !== null && questionById(questionId) ? fallbackAnswer(questionId, ctx, window) : null,
+        fallback: questionId !== null ? fallbackAnswer(questionId, ctx, window) : null,
       };
 
   return (

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { aqiLevel } from "./aqi.ts";
 
 export const airSnapshotSchema = z.object({
   mode: z.enum(["live", "demo"]),
@@ -38,5 +37,3 @@ export function minutesAgo(sourceTimestamp: string, nowMs: number): number {
 export function isStale(sourceTimestamp: string, nowMs: number): boolean {
   return minutesAgo(sourceTimestamp, nowMs) > STALE_AFTER_MINUTES;
 }
-
-export const levelOf = (s: AirSnapshot) => aqiLevel(s.usAqi);

@@ -8,7 +8,6 @@ export const QUESTIONS = [
 ] as const;
 
 export type QuestionId = (typeof QUESTIONS)[number]["id"];
-export const questionById = (id: string) => QUESTIONS.find((q) => q.id === id);
 
 /** Deterministic answers used when the model is unavailable or its output fails validation. */
 export function fallbackAnswer(id: QuestionId, ctx: HouseholdContext, window: BetterWindow | null): string {

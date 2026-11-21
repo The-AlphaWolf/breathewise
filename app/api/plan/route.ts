@@ -7,12 +7,11 @@ import { AirError, fetchLiveAir } from "../../../lib/air-server.ts";
 import { aqiLevel, LEVEL_LABELS } from "../../../lib/aqi.ts";
 import { CITY_IDS } from "../../../lib/cities.ts";
 import { parseCoords } from "../../../lib/geo.ts";
-import { DEMO_IDS, DEMO_SCENARIOS, type DemoId } from "../../../lib/demo.ts";
+import { DEMO_IDS, DEMO_SCENARIOS } from "../../../lib/demo.ts";
 import { rateLimited } from "../../../lib/rate-limit.ts";
 import { contextSchema, planActions } from "../../../lib/rules.ts";
 import { findBetterWindow } from "../../../lib/window.ts";
 
-export const runtime = "nodejs";
 export const maxDuration = 30; // seconds; the model call itself is capped at 12 s
 
 const GEMINI_MODEL = "gemini-3.1-flash-lite";
@@ -23,7 +22,7 @@ const requestSchema = z.object({
   source: z.discriminatedUnion("mode", [
     z.object({ mode: z.literal("live"), cityId: z.enum(CITY_IDS) }),
     z.object({ mode: z.literal("here"), lat: z.number(), lon: z.number() }),
-    z.object({ mode: z.literal("demo"), scenarioId: z.enum(DEMO_IDS as [string, ...string[]]) }),
+    z.object({ mode: z.literal("demo"), scenarioId: z.enum(DEMO_IDS) }),
   ]),
   context: contextSchema,
   question: z.string().trim().max(MAX_QUESTION_LENGTH).default(""),
@@ -53,7 +52,7 @@ export async function POST(request: Request) {
   let air: AirSnapshot;
   try {
     if (source.mode === "demo") {
-      air = DEMO_SCENARIOS[source.scenarioId as DemoId].snapshot;
+      air = DEMO_SCENARIOS[source.scenarioId].snapshot;
     } else if (source.mode === "here") {
       const here = parseCoords(source.lat, source.lon);
       if (here === null) return fail(400, "Invalid request.");

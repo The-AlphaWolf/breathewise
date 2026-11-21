@@ -15,7 +15,6 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
   async headers() {
     return [
       {

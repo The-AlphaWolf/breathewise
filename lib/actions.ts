@@ -19,7 +19,6 @@ export type Action = {
     readonly requires?: readonly ContextFlag[];
     readonly excludes?: readonly ContextFlag[];
   };
-  readonly slot: "morning" | "day" | "evening" | "any";
   readonly cost: "free" | "low" | "equipment";
   readonly scope: "household" | "community";
 };
@@ -34,7 +33,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Based on an area-level model forecast; street-level air can differ.",
     impact: { exposure: "May lower time spent in the worst air of the day." },
     when: { minLevel: 1, maxLevel: 2, requires: ["betterWindow"] },
-    slot: "any", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "outdoor-indoor-alt",
@@ -45,7 +44,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Applies when air quality is unhealthy for sensitive groups or worse, including extra-caution households.",
     impact: { exposure: "Reduces exertion in polluted air, which can lower the amount of particles breathed in." },
     when: { minLevel: 2 },
-    slot: "any", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "school-run-combine",
@@ -56,7 +55,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Assumes a private vehicle is already used for the school run.",
     impact: { emissions: "Fewer separate vehicle trips means lower household transport emissions." },
     when: { requires: ["schoolRun"] },
-    slot: "morning", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "transit-swap",
@@ -67,7 +66,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Transit is not automatically lower exposure: platforms and busy roads can be polluted too.",
     impact: { emissions: "Lower household transport emissions for that trip. No exposure benefit is claimed." },
     when: { requires: ["hasTransit"], excludes: ["mustDrive"] },
-    slot: "morning", cost: "low", scope: "household",
+    cost: "low", scope: "household",
   },
   {
     id: "carpool",
@@ -78,7 +77,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Needs another family with a similar route and schedule.",
     impact: { emissions: "Fewer vehicles on the school route lowers shared emissions and gate congestion." },
     when: { requires: ["schoolRun"] },
-    slot: "morning", cost: "free", scope: "community",
+    cost: "free", scope: "community",
   },
   {
     id: "no-idling",
@@ -92,7 +91,7 @@ export const ACTIONS: readonly Action[] = [
       exposure: "Can reduce exhaust where people queue or wait nearby.",
     },
     when: { requires: ["mustDrive"] },
-    slot: "any", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "wfh",
@@ -106,7 +105,7 @@ export const ACTIONS: readonly Action[] = [
       exposure: "Avoids commute time outdoors and in traffic.",
     },
     when: { minLevel: 3, excludes: ["mustDrive"] },
-    slot: "morning", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "no-burning",
@@ -117,7 +116,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Applies at any air quality level; it matters most in winter.",
     impact: { emissions: "Avoids a local source of particles and smoke across the neighbourhood." },
     when: {},
-    slot: "any", cost: "free", scope: "community",
+    cost: "free", scope: "community",
   },
   {
     id: "cooking-clean",
@@ -128,7 +127,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Never block ventilation or exits; follow appliance instructions.",
     impact: { indoor: "Lowers particles produced inside the home." },
     when: { requires: ["biomassCooking"] },
-    slot: "any", cost: "low", scope: "household",
+    cost: "low", scope: "household",
   },
   {
     id: "no-incense",
@@ -139,7 +138,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "A source-control step, not a replacement for official guidance.",
     impact: { indoor: "Avoids adding particles indoors." },
     when: {},
-    slot: "evening", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "damp-clean",
@@ -150,7 +149,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "A low-effort source-control step.",
     impact: { indoor: "Keeps settled dust from being stirred back into the air." },
     when: {},
-    slot: "day", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "clean-room",
@@ -161,7 +160,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Never reduce required ventilation, cooling, heating or exit access.",
     impact: { indoor: "Helps keep one space lower in particles." },
     when: { minLevel: 2, excludes: ["ownsPurifier"] },
-    slot: "evening", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
   {
     id: "purifier-run",
@@ -172,7 +171,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Check that the filter is clean and follow the manufacturer instructions.",
     impact: { indoor: "Can lower indoor particle levels in that room." },
     when: { minLevel: 1, requires: ["ownsPurifier"] },
-    slot: "any", cost: "equipment", scope: "household",
+    cost: "equipment", scope: "household",
   },
   {
     id: "ventilate-window",
@@ -183,7 +182,7 @@ export const ACTIONS: readonly Action[] = [
     assumption: "Based on an area-level forecast; not suitable when outdoor air is unhealthy.",
     impact: { indoor: "Refreshes indoor air at the lowest-pollution time of the day." },
     when: { maxLevel: 2, requires: ["betterWindow"] },
-    slot: "any", cost: "free", scope: "household",
+    cost: "free", scope: "household",
   },
 ];
 
