@@ -16,6 +16,7 @@ import { AskPanel, type AskView } from "./ask-panel.tsx";
 import { type Mode, ContextForm } from "./context-form.tsx";
 import { CommunityShare, EmissionsEstimate } from "./extras.tsx";
 import { PlanSection } from "./plan-section.tsx";
+import { ThemePicker } from "./theme-picker.tsx";
 
 const DEFAULT_CONTEXT: HouseholdContext = {
   extraCaution: true, schoolRun: true, hasTransit: true, mustDrive: false,
@@ -214,7 +215,10 @@ export function BreatheWisePlanner() {
           <span className="brand-mark" aria-hidden="true">◌</span>
           <span>BreatheWise</span>
         </a>
-        <span className="challenge-label">Challenge 6 · Urban Air Quality Assistant</span>
+        <div className="header-tools">
+          <span className="challenge-label">Challenge 6 · Urban Air Quality Assistant</span>
+          <ThemePicker />
+        </div>
       </header>
       <main className="app-shell" id="main">
         <section className="hero" aria-labelledby="hero-title">

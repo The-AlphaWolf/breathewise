@@ -54,6 +54,10 @@ Otherwise impact is qualitative. Exposure, household-emissions and indoor-air ef
 
 Keys are server-side only (`.env.local`, names listed in `.env.example`). Zod validates every request, upstream response and model response. City allow-list; rate limit, body-size limit and timeout on `/api/plan`. No profile or question is stored or logged. Security headers (CSP with same-origin connections, `nosniff`, referrer policy, permissions policy limiting geolocation to this site) are set in `next.config.ts`.
 
+## Themes
+
+Five colour themes switchable from the header: Clear Sky (default light), Midnight (dark), Forest, Sunset and High contrast. All colours are CSS tokens in `app/globals.css`, one block per theme (`:root[data-theme="..."]`). The first visit follows the OS light/dark preference; the choice is saved in `localStorage` (the app still works if storage is blocked) and a small inline script applies it before first paint to avoid a flash. `lib/themes.test.ts` parses the real CSS and fails the build if any theme drops below WCAG contrast (4.5:1 for text, 3:1 for focus rings) on any text/background pair.
+
 ## Accessibility
 
 Header outside `main`, one `h1`, labelled form controls with native fieldsets, `aria-pressed` on question chips, `aria-live` only for user-triggered results, `role="alert"` for errors, status never by colour alone, 44 px minimum targets, visible focus, reduced-motion guard. Checked at 375 px width with no horizontal scroll.
