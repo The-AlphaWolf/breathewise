@@ -27,12 +27,16 @@ export function AirCard({ air, loading, error, now, window, onRefresh, onUseDemo
       ) : null}
       <p className="eyebrow">2 · Air context</p>
 
-      {loading ? <p role="status">Loading the modelled air-quality outlook…</p> : null}
+      {loading && air === null ? <p role="status">Loading the modelled air-quality outlook…</p> : null}
 
       {error !== null ? (
         <div role="alert" className="model-error">
           <p>{error}</p>
-          <p>Official local alerts remain the best source right now.</p>
+          <p>
+            {air !== null
+              ? "Could not refresh. The last forecast is shown below; check its time before relying on it."
+              : "Official local alerts remain the best source right now."}
+          </p>
           <button className="model-button" type="button" onClick={onUseDemo}>Switch to demo data</button>
         </div>
       ) : null}
@@ -62,7 +66,13 @@ export function AirCard({ air, loading, error, now, window, onRefresh, onUseDemo
             <div><dt>Index</dt><dd>US AQI (not the Indian National AQI)</dd></div>
             <div><dt>Source time</dt><dd>{formatIst(air.sourceTimestamp)}</dd></div>
             {!demo && now !== null ? (
-              <div><dt>Freshness</dt><dd>Source time was {Math.max(0, minutesAgo(air.sourceTimestamp, now))} min ago</dd></div>
+              <div>
+                <dt>Freshness</dt>
+                <dd>
+                  Source time {Math.max(0, minutesAgo(air.sourceTimestamp, now))} min ago · fetched{" "}
+                  {Math.max(0, Math.round((now - Date.parse(air.retrievedAt)) / 60_000))} min ago · auto-refreshes every 5 min
+                </dd>
+              </div>
             ) : null}
             <div>
               <dt>Better outdoor window</dt>

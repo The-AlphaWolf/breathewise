@@ -39,7 +39,7 @@ The plan is computed in the browser by the same pure code the server uses to val
 
 ## Data sources, labels, attribution
 
-- Live: [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) (CAMS ENSEMBLE, CC BY 4.0). Labelled "area-level model forecast", "US AQI", never the Indian National AQI and never a station reading. Source time is shown in IST with freshness; older than 3 hours shows a stale banner.
+- Live: [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) (CAMS ENSEMBLE, CC BY 4.0). Labelled "area-level model forecast", "US AQI", never the Indian National AQI and never a station reading. Source time is shown in IST with freshness (source time and fetch time, ticking each minute); the page auto-refreshes every 5 minutes while the tab is visible and catches up when a stale tab returns, keeping the last forecast on screen with a warning if a refresh fails. The server caches upstream calls for 5 minutes. The CAMS model itself updates roughly hourly, so the value can legitimately stay the same between refreshes; older than 3 hours shows a stale banner.
 - Demo mode: three fixed fixtures (severe, moderate, improving) with hourly series, behind an explicit toggle and persistent banner. A provider failure shows an error and an offer to switch; it never silently swaps to demo data.
 - "My current location" is opt-in browser geolocation. Coordinates are validated to an India bounding box, rounded to 2 decimals (~1 km), used for one Open-Meteo request, never stored, and never sent to the model (it only sees "Your location (approx.)").
 - Cities are a preset list (Delhi NCR, Lucknow, Kanpur, Patna, Kolkata, Mumbai) validated against an allow-list.

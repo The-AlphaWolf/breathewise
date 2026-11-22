@@ -14,7 +14,7 @@ export async function GET(request: Request) {
 
   try {
     return Response.json(await fetchLiveAir(coords ?? city), {
-      headers: { "Cache-Control": "public, s-maxage=600, stale-while-revalidate=300" },
+      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=120" },
     });
   } catch (error) {
     const status = error instanceof AirError ? error.status : 503;

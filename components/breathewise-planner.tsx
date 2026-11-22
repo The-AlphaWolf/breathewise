@@ -22,6 +22,8 @@ const DEFAULT_CONTEXT: HouseholdContext = {
   biomassCooking: false, lowBudget: true, ownsPurifier: false,
 };
 const AI_TIMEOUT_MS = 15_000;
+// Matches the server cache (5 min); the model itself updates roughly hourly.
+const AUTO_REFRESH_MS = 300_000;
 
 type AiState =
   | { readonly key: string; readonly status: "loading" }
@@ -52,7 +54,7 @@ export function BreatheWisePlanner() {
   const [mode, setMode] = useState<Mode>("live");
   const [demoId, setDemoId] = useState<DemoId>("severe");
   const [ctx, setCtx] = useState<HouseholdContext>(DEFAULT_CONTEXT);
-  const [live, setLive] = useState<AirSnapshot | null>(null);
+  const [live, setLive] = useState<{ readonly key: string; readonly snapshot: AirSnapshot } | null>(null);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [reload, setReload] = useState(0);
@@ -61,30 +63,63 @@ export function BreatheWisePlanner() {
   const [questionId, setQuestionId] = useState<QuestionId | null>(null);
   const [aiState, setAiState] = useState<AiState | null>(null);
   const aiAbort = useRef<AbortController | null>(null);
+  const lastFetched = useRef<number | null>(null);
+  const targetKey = cityId === "here" && coords !== null ? `here:${coords.lat},${coords.lon}` : cityId;
 
+  // Fetch (and refetch) live data. The previous snapshot stays on screen while a refresh runs.
   useEffect(() => {
     if (mode !== "live") return;
     const controller = new AbortController();
     setLoading(true);
     setLiveError(null);
-    setLive(null);
     loadLive(cityId, coords, controller.signal)
-      .then((snapshot) => { setLive(snapshot); setNow(Date.now()); })
+      .then((snapshot) => {
+        lastFetched.current = Date.now();
+        setLive({ key: targetKey, snapshot });
+        setNow(Date.now());
+      })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
         setLiveError(error instanceof Error ? error.message : "The modelled air-quality outlook is temporarily unavailable.");
       })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [mode, cityId, coords, reload]);
+    // coords is covered by targetKey
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, cityId, targetKey, reload]);
 
-  const air = mode === "demo" ? DEMO_SCENARIOS[demoId].snapshot : live;
+  // Tick once a minute so "N min ago" and the stale banner stay accurate.
+  useEffect(() => {
+    setNow(Date.now());
+    const tick = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(tick);
+  }, []);
+
+  // Auto-refresh while the tab is visible, and catch up when a stale tab becomes visible again.
+  useEffect(() => {
+    if (mode !== "live") return;
+    const refresh = () => { if (document.visibilityState === "visible") setReload((n) => n + 1); };
+    const onVisible = () => {
+      const last = lastFetched.current;
+      if (document.visibilityState === "visible" && last !== null && Date.now() - last > AUTO_REFRESH_MS) {
+        setReload((n) => n + 1);
+      }
+    };
+    const timer = setInterval(refresh, AUTO_REFRESH_MS);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [mode]);
+
+  const air = mode === "demo" ? DEMO_SCENARIOS[demoId].snapshot : live?.key === targetKey ? live.snapshot : null;
   const level = air === null ? null : aqiLevel(air.usAqi);
   const window = useMemo(() => (air === null ? null : findBetterWindow(air.hourly, air.usAqi)), [air]);
   const plan = useMemo(() => planActions(ctx, level, window), [ctx, level, window]);
 
-  // An AI answer belongs to one exact (source, household, question) combination.
-  const currentKey = JSON.stringify([mode, mode === "demo" ? demoId : cityId, coords, ctx, questionText]);
+  // An AI answer belongs to one exact (source, data time, household, question) combination.
+  const currentKey = JSON.stringify([mode, mode === "demo" ? demoId : cityId, coords, air?.sourceTimestamp ?? null, ctx, questionText]);
   const currentAi = aiState !== null && aiState.key === currentKey ? aiState : null;
 
   const shownTop = useMemo(() => {

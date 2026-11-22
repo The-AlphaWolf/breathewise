@@ -40,7 +40,7 @@ export async function fetchLiveAir(target: LiveTarget): Promise<AirSnapshot> {
   let upstream: Response;
   try {
     upstream = await fetch("https://air-quality-api.open-meteo.com/v1/air-quality?" + query, {
-      next: { revalidate: 600 },
+      next: { revalidate: 300 },
       signal: AbortSignal.timeout(8_000),
     });
   } catch {
