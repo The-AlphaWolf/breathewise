@@ -817,11 +817,30 @@ ol.recommendation-grid {
 }
 
 .theme-toggle {
-  align-items: center;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-control);
-  color: var(--ink);
+  display: inline-flex;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+}
+
+.theme-toggle legend {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.theme-option {
+  align-items: center;
+  border-radius: 6px;
+  color: var(--muted);
   cursor: pointer;
   display: inline-flex;
   font-size: 0.875rem;
@@ -829,18 +848,35 @@ ol.recommendation-grid {
   gap: 8px;
   min-height: 44px;
   padding: 0 16px;
+  position: relative;
 }
 
-.theme-toggle:hover {
+.theme-option input {
+  height: 100%;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.theme-option:hover {
+  color: var(--ink);
+}
+
+.theme-option:has(input:checked) {
   background: var(--blue-soft);
+  color: var(--ink);
 }
 
-.theme-toggle[aria-checked="true"] {
-  border-color: var(--blue);
+.theme-option:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 
-.theme-toggle svg {
+.theme-option svg {
   fill: none;
+  flex: none;
   height: 16px;
   stroke: currentColor;
   stroke-linecap: round;
