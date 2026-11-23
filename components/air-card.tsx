@@ -1,20 +1,20 @@
 "use client";
 
-import { type AirSnapshot, formatIst, isStale, minutesAgo } from "../lib/air.ts";
+import { AUTO_REFRESH_MS, type AirSnapshot, formatIst, isStale, minutesAgo, STALE_AFTER_MINUTES } from "../lib/air.ts";
 import { usAqiCategory } from "../lib/aqi.ts";
-import type { BetterWindow } from "../lib/window.ts";
+import { type BetterWindow, windowRange } from "../lib/window.ts";
 
 type Props = {
   readonly air: AirSnapshot | null;
   readonly loading: boolean;
   readonly error: string | null;
   readonly now: number | null;
-  readonly window: BetterWindow | null;
+  readonly betterWindow: BetterWindow | null;
   readonly onRefresh: () => void;
   readonly onUseDemo: () => void;
 };
 
-export function AirCard({ air, loading, error, now, window, onRefresh, onUseDemo }: Props) {
+export function AirCard({ air, loading, error, now, betterWindow, onRefresh, onUseDemo }: Props) {
   const demo = air?.sourceType === "demo";
   const stale = air !== null && !demo && now !== null && isStale(air.sourceTimestamp, now);
 
@@ -45,7 +45,7 @@ export function AirCard({ air, loading, error, now, window, onRefresh, onUseDemo
         <>
           {stale ? (
             <p className="stale-banner" role="status">
-              This forecast is more than 3 hours old and may not reflect current air. Refresh before relying on it.
+              This forecast is more than {STALE_AFTER_MINUTES / 60} hours old and may not reflect current air. Refresh before relying on it.
             </p>
           ) : null}
           <div className="status-heading">
@@ -70,16 +70,16 @@ export function AirCard({ air, loading, error, now, window, onRefresh, onUseDemo
                 <dt>Freshness</dt>
                 <dd>
                   Source time {Math.max(0, minutesAgo(air.sourceTimestamp, now))} min ago · fetched{" "}
-                  {Math.max(0, Math.round((now - Date.parse(air.retrievedAt)) / 60_000))} min ago · auto-refreshes every 5 min
+                  {Math.max(0, Math.round((now - Date.parse(air.retrievedAt)) / 60_000))} min ago · auto-refreshes every {AUTO_REFRESH_MS / 60_000} min
                 </dd>
               </div>
             ) : null}
             <div>
               <dt>Better outdoor window</dt>
               <dd>
-                {window === null
+                {betterWindow === null
                   ? "No clearly better window in the next 12 hours."
-                  : `${window.start.slice(11)}–${window.end.slice(11)} IST: about ${window.gainPercent}% lower US AQI than now (forecast).`}
+                  : `${windowRange(betterWindow)} IST: about ${betterWindow.gainPercent}% lower US AQI than now (forecast).`}
               </dd>
             </div>
           </dl>

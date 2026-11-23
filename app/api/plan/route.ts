@@ -65,8 +65,8 @@ export async function POST(request: Request) {
   }
 
   const level = aqiLevel(air.usAqi);
-  const window = findBetterWindow(air.hourly, air.usAqi);
-  const plan = planActions(context, level, window);
+  const betterWindow = findBetterWindow(air.hourly, air.usAqi);
+  const plan = planActions(context, level, betterWindow);
   const approved = new Set([...plan.top, ...plan.more].map((a) => a.id));
 
   const started = Date.now();
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       prompt: buildPrompt({
         cityLabel: air.locationLabel,
         levelLabel: level === null ? "unavailable" : LEVEL_LABELS[level],
-        window,
+        betterWindow,
         ctx: context,
         plan,
         question,

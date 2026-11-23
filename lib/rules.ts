@@ -21,10 +21,10 @@ const ROUTINE_FLAGS = ["mustDrive", "hasTransit", "ownsPurifier", "biomassCookin
 
 export type Plan = { readonly top: readonly Action[]; readonly more: readonly Action[] };
 
-function flagsOf(ctx: HouseholdContext, window: BetterWindow | null): Set<ContextFlag> {
+function flagsOf(ctx: HouseholdContext, betterWindow: BetterWindow | null): Set<ContextFlag> {
   const flags = new Set<ContextFlag>();
   for (const flag of ROUTINE_FLAGS) if (ctx[flag]) flags.add(flag);
-  if (window !== null) flags.add("betterWindow");
+  if (betterWindow !== null) flags.add("betterWindow");
   return flags;
 }
 
@@ -33,9 +33,9 @@ function flagsOf(ctx: HouseholdContext, window: BetterWindow | null): Set<Contex
  * least one indoor and one emissions action. Pure, so it runs on both client
  * and server and the server can validate model output against it.
  */
-export function planActions(ctx: HouseholdContext, level: Level | null, window: BetterWindow | null): Plan {
+export function planActions(ctx: HouseholdContext, level: Level | null, betterWindow: BetterWindow | null): Plan {
   const effective = effectiveLevel(level ?? CAUTIOUS_DEFAULT, ctx.extraCaution);
-  const flags = flagsOf(ctx, window);
+  const flags = flagsOf(ctx, betterWindow);
 
   const score = (action: Action): number => {
     let s = ctx.lowBudget ? COST_FIT[action.cost] : 0;

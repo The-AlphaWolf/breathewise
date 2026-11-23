@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { findBetterWindow } from "./window.ts";
+import { findBetterWindow, windowRange } from "./window.ts";
 
 const series = (values: (number | null)[]) =>
   values.map((usAqi, i) => ({ time: `2026-11-20T${String(8 + i).padStart(2, "0")}:00`, usAqi }));
@@ -26,4 +26,10 @@ test("handles nulls, short series and missing current AQI", () => {
   assert.equal(findBetterWindow(series([300, 100]), 300), null);
   assert.equal(findBetterWindow([], 300), null);
   assert.equal(findBetterWindow(series([300, 100, 100]), null), null);
+});
+
+test("windowRange formats the window bounds as HH:MM–HH:MM", () => {
+  const w = findBetterWindow(series([100, 90, 40, 40, 90]), 100);
+  assert.ok(w);
+  assert.equal(windowRange(w), "10:00–12:00");
 });

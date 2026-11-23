@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { AirSnapshot } from "./air.ts";
+import { type AirSnapshot, UNAVAILABLE_MESSAGE } from "./air.ts";
 import { cityById } from "./cities.ts";
 
 export class AirError extends Error {
@@ -46,7 +46,7 @@ export async function fetchLiveAir(target: LiveTarget): Promise<AirSnapshot> {
       signal: AbortSignal.timeout(8_000),
     });
   } catch {
-    throw new AirError("The modelled air-quality outlook is temporarily unavailable. Use official local alerts instead.", 503);
+    throw new AirError(`${UNAVAILABLE_MESSAGE} Use official local alerts instead.`, 503);
   }
   if (!upstream.ok) throw new AirError("The modelled air-quality provider did not return a usable response.", 502);
 

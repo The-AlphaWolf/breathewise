@@ -53,10 +53,11 @@ export function AskPanel({ text, questionId, onQuestion, onAsk, view }: Props) {
             id="question"
             rows={3}
             maxLength={MAX_QUESTION_LENGTH}
+            aria-describedby="question-count"
             value={text}
             onChange={(e) => onQuestion(e.target.value, null)}
           />
-          <p className="field-hint">{text.length}/{MAX_QUESTION_LENGTH}</p>
+          <p className="field-hint" id="question-count">{text.length}/{MAX_QUESTION_LENGTH}</p>
         </div>
         <button className="ai-button" type="button" disabled={busy} onClick={onAsk}>
           {busy ? "Preparing explanation…" : "Explain my plan"}

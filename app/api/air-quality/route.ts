@@ -1,3 +1,4 @@
+import { UNAVAILABLE_MESSAGE } from "../../../lib/air.ts";
 import { AirError, fetchLiveAir } from "../../../lib/air-server.ts";
 import { cityById } from "../../../lib/cities.ts";
 import { parseCoords } from "../../../lib/geo.ts";
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     const status = error instanceof AirError ? error.status : 503;
-    const message = error instanceof AirError ? error.message : "The modelled air-quality outlook is temporarily unavailable.";
+    const message = error instanceof AirError ? error.message : UNAVAILABLE_MESSAGE;
     return Response.json({ error: message }, { status });
   }
 }

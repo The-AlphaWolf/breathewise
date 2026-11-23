@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { estimateAvoidedKg, FACTORS_KG_PER_KM, type Vehicle } from "../lib/emissions.ts";
 
-export function CommunityShare({ message }: { readonly message: string | null }) {
+export function CommunityShare({ message }: { readonly message: string }) {
   const [status, setStatus] = useState("");
-  if (message === null) return null;
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(message ?? "");
+      await navigator.clipboard.writeText(message);
       setStatus("Copied to clipboard.");
     } catch {
       setStatus("Copy is not available here. Select the text and copy it manually.");

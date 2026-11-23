@@ -31,7 +31,7 @@ export const SYSTEM_PROMPT = [
 export function buildPrompt(input: {
   readonly cityLabel: string;
   readonly levelLabel: string;
-  readonly window: BetterWindow | null;
+  readonly betterWindow: BetterWindow | null;
   readonly ctx: HouseholdContext;
   readonly plan: Plan;
   readonly question: string;
@@ -39,7 +39,7 @@ export function buildPrompt(input: {
   const describe = (a: { id: string; title: string; impact: object }) => ({ id: a.id, title: a.title, impact: a.impact });
   return [
     `AREA: ${input.cityLabel} (US AQI category: ${input.levelLabel})`,
-    `BETTER WINDOW: ${input.window === null ? "none" : `${input.window.start} to ${input.window.end}`}`,
+    `BETTER WINDOW: ${input.betterWindow === null ? "none" : `${input.betterWindow.start} to ${input.betterWindow.end}`}`,
     `HOUSEHOLD: ${JSON.stringify(input.ctx)}`,
     `APPROVED ACTIONS (current order): ${JSON.stringify(input.plan.top.map(describe))}`,
     `OTHER APPROVED ACTIONS: ${JSON.stringify(input.plan.more.map(describe))}`,

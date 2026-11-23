@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { actionById } from "../lib/actions.ts";
-import type { AiOutput } from "../lib/ai.ts";
-import { type AirSnapshot, airSnapshotSchema } from "../lib/air.ts";
+import { airUrl, type Coords } from "../lib/air.ts";
 import { aqiLevel, LEVEL_LABELS } from "../lib/aqi.ts";
 import { DEMO_SCENARIOS, type DemoId } from "../lib/demo.ts";
 import { parseCoords } from "../lib/geo.ts";
@@ -18,36 +17,13 @@ import { CommunityShare, EmissionsEstimate } from "./extras.tsx";
 import { BrandMark } from "./logo.tsx";
 import { PlanSection } from "./plan-section.tsx";
 import { ThemeToggle } from "./theme-toggle.tsx";
+import { useAiAnswer } from "./use-ai-answer.ts";
+import { useLiveAir } from "./use-live-air.ts";
 
 const DEFAULT_CONTEXT: HouseholdContext = {
   extraCaution: true, schoolRun: true, hasTransit: true, mustDrive: false,
   biomassCooking: false, lowBudget: true, ownsPurifier: false,
 };
-const AI_TIMEOUT_MS = 15_000;
-// Matches the server cache (5 min); the model itself updates roughly hourly.
-const AUTO_REFRESH_MS = 300_000;
-
-type AiState =
-  | { readonly key: string; readonly status: "loading" }
-  | { readonly key: string; readonly status: "ok"; readonly ai: AiOutput }
-  | { readonly key: string; readonly status: "unavailable"; readonly message: string };
-
-type Coords = { readonly lat: number; readonly lon: number };
-
-async function loadLive(cityId: string, coords: Coords | null, signal: AbortSignal): Promise<AirSnapshot> {
-  const url = cityId === "here" && coords !== null
-    ? `/api/air-quality?lat=${coords.lat}&lon=${coords.lon}`
-    : `/api/air-quality?city=${encodeURIComponent(cityId)}`;
-  const response = await fetch(url, { signal });
-  const payload: unknown = await response.json().catch(() => null);
-  if (!response.ok) {
-    const message = (payload as { error?: unknown } | null)?.error;
-    throw new Error(typeof message === "string" ? message : "The modelled air-quality outlook is temporarily unavailable.");
-  }
-  const parsed = airSnapshotSchema.safeParse(payload);
-  if (!parsed.success) throw new Error("The air-quality response was not in the expected format.");
-  return parsed.data;
-}
 
 export function BreatheWisePlanner() {
   const [cityId, setCityId] = useState("delhi-ncr");
@@ -56,73 +32,21 @@ export function BreatheWisePlanner() {
   const [mode, setMode] = useState<Mode>("live");
   const [demoId, setDemoId] = useState<DemoId>("severe");
   const [ctx, setCtx] = useState<HouseholdContext>(DEFAULT_CONTEXT);
-  const [live, setLive] = useState<{ readonly key: string; readonly snapshot: AirSnapshot } | null>(null);
-  const [liveError, setLiveError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [reload, setReload] = useState(0);
-  const [now, setNow] = useState<number | null>(null);
   const [questionText, setQuestionText] = useState("");
   const [questionId, setQuestionId] = useState<QuestionId | null>(null);
-  const [aiState, setAiState] = useState<AiState | null>(null);
-  const aiAbort = useRef<AbortController | null>(null);
-  const lastFetched = useRef<number | null>(null);
-  const targetKey = cityId === "here" && coords !== null ? `here:${coords.lat},${coords.lon}` : cityId;
 
-  // Fetch (and refetch) live data. The previous snapshot stays on screen while a refresh runs.
-  useEffect(() => {
-    if (mode !== "live") return;
-    const controller = new AbortController();
-    setLoading(true);
-    setLiveError(null);
-    loadLive(cityId, coords, controller.signal)
-      .then((snapshot) => {
-        lastFetched.current = Date.now();
-        setLive({ key: targetKey, snapshot });
-        setNow(Date.now());
-      })
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        setLiveError(error instanceof Error ? error.message : "The modelled air-quality outlook is temporarily unavailable.");
-      })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => controller.abort();
-    // coords is covered by targetKey
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, cityId, targetKey, reload]);
-
-  // Tick once a minute so "N min ago" and the stale banner stay accurate.
-  useEffect(() => {
-    setNow(Date.now());
-    const tick = setInterval(() => setNow(Date.now()), 60_000);
-    return () => clearInterval(tick);
-  }, []);
-
-  // Auto-refresh while the tab is visible, and catch up when a stale tab becomes visible again.
-  useEffect(() => {
-    if (mode !== "live") return;
-    const refresh = () => { if (document.visibilityState === "visible") setReload((n) => n + 1); };
-    const onVisible = () => {
-      const last = lastFetched.current;
-      if (document.visibilityState === "visible" && last !== null && Date.now() - last > AUTO_REFRESH_MS) {
-        setReload((n) => n + 1);
-      }
-    };
-    const timer = setInterval(refresh, AUTO_REFRESH_MS);
-    document.addEventListener("visibilitychange", onVisible);
-    return () => {
-      clearInterval(timer);
-      document.removeEventListener("visibilitychange", onVisible);
-    };
-  }, [mode]);
-
-  const air = mode === "demo" ? DEMO_SCENARIOS[demoId].snapshot : live?.key === targetKey ? live.snapshot : null;
+  const liveAir = useLiveAir(mode === "live", airUrl(cityId, coords));
+  const air = mode === "demo" ? DEMO_SCENARIOS[demoId].snapshot : liveAir.snapshot;
   const level = air === null ? null : aqiLevel(air.usAqi);
-  const window = useMemo(() => (air === null ? null : findBetterWindow(air.hourly, air.usAqi)), [air]);
-  const plan = useMemo(() => planActions(ctx, level, window), [ctx, level, window]);
+  const betterWindow = useMemo(() => (air === null ? null : findBetterWindow(air.hourly, air.usAqi)), [air]);
+  const plan = useMemo(() => planActions(ctx, level, betterWindow), [ctx, level, betterWindow]);
 
-  // An AI answer belongs to one exact (source, data time, household, question) combination.
-  const currentKey = JSON.stringify([mode, mode === "demo" ? demoId : cityId, coords, air?.sourceTimestamp ?? null, ctx, questionText]);
-  const currentAi = aiState !== null && aiState.key === currentKey ? aiState : null;
+  const source =
+    mode === "demo" ? { mode, scenarioId: demoId }
+    : cityId === "here" && coords !== null ? { mode: "here", lat: coords.lat, lon: coords.lon }
+    : { mode, cityId };
+  const ai = useAiAnswer(JSON.stringify([source, air?.sourceTimestamp ?? null, ctx, questionText]));
+  const currentAi = ai.current;
 
   const shownTop = useMemo(() => {
     if (currentAi?.status !== "ok") return { top: plan.top, more: plan.more };
@@ -160,45 +84,6 @@ export function BreatheWisePlanner() {
     );
   }
 
-  async function ask() {
-    if (air === null) return;
-    aiAbort.current?.abort();
-    const controller = new AbortController();
-    aiAbort.current = controller;
-    const key = currentKey;
-    setAiState({ key, status: "loading" });
-
-    const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
-    try {
-      const response = await fetch("/api/plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          source:
-            mode === "demo" ? { mode, scenarioId: demoId }
-            : cityId === "here" && coords !== null ? { mode: "here", lat: coords.lat, lon: coords.lon }
-            : { mode, cityId },
-          context: ctx,
-          question: questionText,
-        }),
-      });
-      const payload = (await response.json().catch(() => null)) as { ai?: AiOutput; error?: string } | null;
-      if (!response.ok || payload?.ai === undefined) throw new Error(payload?.error ?? "AI explanation is unavailable.");
-      setAiState({ key, status: "ok", ai: payload.ai });
-    } catch (error) {
-      if (aiAbort.current !== controller) return;
-      setAiState({
-        key,
-        status: "unavailable",
-        message: (error instanceof Error && !controller.signal.aborted ? error.message : "AI explanation timed out.") +
-          " Showing the rules-based plan instead.",
-      });
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
   const askView: AskView =
     currentAi === null ? { status: "idle" }
     : currentAi.status === "loading" ? { status: "loading" }
@@ -206,8 +91,11 @@ export function BreatheWisePlanner() {
     : {
         status: "unavailable",
         message: currentAi.message,
-        fallback: questionId !== null ? fallbackAnswer(questionId, ctx, window) : null,
+        fallback: questionId !== null ? fallbackAnswer(questionId, ctx, betterWindow) : null,
       };
+  const shareMessage = air === null
+    ? null
+    : buildCommunityMessage(air.locationLabel, level === null ? "unavailable" : LEVEL_LABELS[level], [...plan.top, ...plan.more]);
 
   return (
     <>
@@ -238,9 +126,9 @@ export function BreatheWisePlanner() {
 
         <section className="dashboard-grid" aria-label="Air context and trust">
           <AirCard
-            air={air} loading={mode === "live" && loading} error={mode === "live" ? liveError : null}
-            now={now} window={window}
-            onRefresh={() => setReload((n) => n + 1)} onUseDemo={() => setMode("demo")}
+            air={air} loading={mode === "live" && liveAir.loading} error={mode === "live" ? liveAir.error : null}
+            now={liveAir.now} betterWindow={betterWindow}
+            onRefresh={liveAir.refresh} onUseDemo={() => setMode("demo")}
           />
           <article className="trust-card">
             <p className="eyebrow">Truth and safety contract</p>
@@ -257,25 +145,17 @@ export function BreatheWisePlanner() {
           <PlanSection top={shownTop.top} more={shownTop.more} whyForYou={whyForYou} />
         ) : (
           <p className="section-intro" role="status">
-            {mode === "live" && loading ? "Your plan appears once the air data loads." : "Switch to demo data to see a sample plan."}
+            {mode === "live" && liveAir.loading ? "Your plan appears once the air data loads." : "Switch to demo data to see a sample plan."}
           </p>
         )}
 
-        {air !== null ? (
-          <CommunityShare
-            message={buildCommunityMessage(
-              air.locationLabel,
-              level === null ? "unavailable" : LEVEL_LABELS[level],
-              [...plan.top, ...plan.more],
-            )}
-          />
-        ) : null}
+        {shareMessage !== null ? <CommunityShare message={shareMessage} /> : null}
         <EmissionsEstimate />
 
         <AskPanel
           text={questionText} questionId={questionId}
           onQuestion={(text, id) => { setQuestionText(text); setQuestionId(id); }}
-          onAsk={() => void ask()} view={askView}
+          onAsk={() => { if (air !== null) void ai.ask({ source, context: ctx, question: questionText }); }} view={askView}
         />
       </main>
       <footer className="site-footer">

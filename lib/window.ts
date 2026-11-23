@@ -9,6 +9,9 @@ export type BetterWindow = {
 
 const MIN_GAIN = 0.2;
 
+/** "2026-11-20T14:00" bounds → "14:00–16:00" (IST, as returned by the model). */
+export const windowRange = (w: BetterWindow): string => `${w.start.slice(11)}–${w.end.slice(11)}`;
+
 function plusOneHour(time: string): string {
   return new Date(Date.parse(time + ":00Z") + 3_600_000).toISOString().slice(0, 16);
 }

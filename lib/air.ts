@@ -19,6 +19,18 @@ export const airSnapshotSchema = z.object({
 export type AirSnapshot = z.infer<typeof airSnapshotSchema>;
 
 export const STALE_AFTER_MINUTES = 180;
+/** Matches the server cache (5 min); the model itself updates roughly hourly. */
+export const AUTO_REFRESH_MS = 300_000;
+export const UNAVAILABLE_MESSAGE = "The modelled air-quality outlook is temporarily unavailable.";
+
+export type Coords = { readonly lat: number; readonly lon: number };
+
+/** Live-data endpoint for a city, or for the user's rounded coordinates when "here" is chosen. */
+export function airUrl(cityId: string, coords: Coords | null): string {
+  return cityId === "here" && coords !== null
+    ? `/api/air-quality?lat=${coords.lat}&lon=${coords.lon}`
+    : `/api/air-quality?city=${encodeURIComponent(cityId)}`;
+}
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /** "2026-11-20T08:00" → "20 Nov, 08:00 IST" (string formatting; no timezone maths). */

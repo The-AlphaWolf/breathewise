@@ -1,5 +1,5 @@
 import type { HouseholdContext } from "./rules.ts";
-import type { BetterWindow } from "./window.ts";
+import { type BetterWindow, windowRange } from "./window.ts";
 
 export const QUESTIONS = [
   { id: "must-drive", text: "We must drive today. What is the most practical plan?" },
@@ -10,14 +10,14 @@ export const QUESTIONS = [
 export type QuestionId = (typeof QUESTIONS)[number]["id"];
 
 /** Deterministic answers used when the model is unavailable or its output fails validation. */
-export function fallbackAnswer(id: QuestionId, ctx: HouseholdContext, window: BetterWindow | null): string {
+export function fallbackAnswer(id: QuestionId, ctx: HouseholdContext, betterWindow: BetterWindow | null): string {
   switch (id) {
     case "must-drive":
       return "If driving is required, keep it to essential travel, combine errands that would otherwise be separate trips, and switch the engine off while waiting. Check official local alerts before leaving.";
     case "outdoor-window":
-      return window === null
+      return betterWindow === null
         ? "The forecast shows no clearly better outdoor window today. Keep flexible activity indoors or short unless official local information shows an improvement."
-        : `The forecast suggests lower US AQI around ${window.start.slice(11)}–${window.end.slice(11)} (about ${window.gainPercent}% lower than now). It is a model forecast, so re-check official local data before moving flexible activity there.`;
+        : `The forecast suggests lower US AQI around ${windowRange(betterWindow)} (about ${betterWindow.gainPercent}% lower than now). It is a model forecast, so re-check official local data before moving flexible activity there.`;
     case "indoor-low-cost":
       return ctx.lowBudget
         ? "Prioritise free actions: skip incense and coils, damp-mop instead of dry sweeping, and keep one room free of smoke sources. Do not compromise safe cooking, ventilation or heat safety."

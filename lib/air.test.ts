@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { formatIst, isStale, minutesAgo } from "./air.ts";
+import { airUrl, formatIst, isStale, minutesAgo } from "./air.ts";
 import { DEMO_SCENARIOS } from "./demo.ts";
 import { findBetterWindow } from "./window.ts";
 
@@ -24,4 +24,10 @@ test("demo fixtures: hourly series drive the window logic", () => {
   assert.equal(w("severe"), null);
   assert.ok(w("moderate"));
   assert.ok(w("improving"));
+});
+
+test("airUrl uses coordinates only for a located user, otherwise the encoded city id", () => {
+  assert.equal(airUrl("here", { lat: 28.61, lon: 77.21 }), "/api/air-quality?lat=28.61&lon=77.21");
+  assert.equal(airUrl("delhi-ncr", { lat: 28.61, lon: 77.21 }), "/api/air-quality?city=delhi-ncr");
+  assert.equal(airUrl("here", null), "/api/air-quality?city=here");
 });
