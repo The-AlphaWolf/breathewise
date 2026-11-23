@@ -10,7 +10,6 @@ export const metadata: Metadata = {
     "A context-aware planner for safer, lower-emission choices during urban air pollution.",
 };
 
-// Used only by the quiet themes (Field notes, Station); other themes keep the system font.
 const instrument = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument", display: "swap" });
 
 // Runs before first paint so the saved (or OS-preferred) theme never flashes the wrong colours.

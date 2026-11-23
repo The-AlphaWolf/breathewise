@@ -36,21 +36,31 @@ const PAIRS: [string, string, number][] = [
   ["focus", "paper", 3], ["focus", "surface", 3],
 ];
 
-// Shape and type tokens have defaults in :root; only the quiet themes override them.
-const SHAPE = /^(w|r|label|track|badge)-|^font-ui$|^on-brand$/;
+// Shape and type tokens are shared by both themes and live in the plain :root block.
+const SHAPE = /^(w|r|label|track|badge)-|^font-ui$/;
 const colourKeys = (id: string) => Object.keys(tokens(id)).filter((k) => !SHAPE.test(k)).sort();
 
-test("every theme defines the same colour token set as the default theme", () => {
-  const base = colourKeys("sky");
-  for (const { id } of THEMES) assert.deepEqual(colourKeys(id), base, id);
+test("both themes define the same colour tokens, and no shape tokens", () => {
+  const base = colourKeys("light");
+  assert.ok(base.length > 20);
+  for (const { id } of THEMES) {
+    assert.deepEqual(colourKeys(id), base, id);
+    assert.deepEqual(Object.keys(tokens(id)).filter((k) => SHAPE.test(k)), [], `${id} must not override shape tokens`);
+  }
 });
 
-test("shape and type tokens used by the stylesheet all have a default in :root", () => {
+test("every token the stylesheet uses is defined, shape tokens in :root and colours in each theme", () => {
   const root = /:root \{([^}]*)\}/.exec(css);
   assert.ok(root);
-  const defined = new Set([...root[1].matchAll(/--([a-z0-9-]+):/g)].map((m) => m[1]));
-  const used = new Set([...css.matchAll(/var\(--((?:w|r|label|track|badge)-[a-z-]+|font-ui|on-brand)\)/g)].map((m) => m[1]));
-  for (const key of used) assert.ok(defined.has(key), `--${key} has no default`);
+  const shape = new Set([...root[1].matchAll(/--([a-z0-9-]+):/g)].map((m) => m[1]));
+  const used = new Set([...css.matchAll(/var\(--([a-z0-9-]+)\)/g)].map((m) => m[1]));
+  assert.ok(used.size > 25);
+  const external = new Set(["font-instrument"]); // injected by next/font on <html>
+  for (const key of used) {
+    if (external.has(key)) continue;
+    if (SHAPE.test(key)) assert.ok(shape.has(key), `--${key} has no default in :root`);
+    else for (const { id } of THEMES) assert.ok(key in tokens(id), `--${key} missing in theme ${id}`);
+  }
 });
 
 for (const { id } of THEMES) {
@@ -65,6 +75,6 @@ for (const { id } of THEMES) {
 
 test("theme ids are unique and validated", () => {
   assert.equal(new Set(THEMES.map((t) => t.id)).size, THEMES.length);
-  assert.ok(isTheme("midnight"));
-  assert.ok(!isTheme("neon") && !isTheme(null));
+  assert.ok(isTheme("dark") && isTheme("light"));
+  assert.ok(!isTheme("neon") && !isTheme("midnight") && !isTheme(null));
 });
