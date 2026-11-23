@@ -15,6 +15,7 @@ import { AirCard } from "./air-card.tsx";
 import { AskPanel, type AskView } from "./ask-panel.tsx";
 import { type Mode, ContextForm } from "./context-form.tsx";
 import { CommunityShare, EmissionsEstimate } from "./extras.tsx";
+import { BrandMark } from "./logo.tsx";
 import { PlanSection } from "./plan-section.tsx";
 import { ThemeToggle } from "./theme-toggle.tsx";
 
@@ -212,7 +213,7 @@ export function BreatheWisePlanner() {
     <>
       <header className="site-header">
         <a className="brand" href="#main" aria-label="BreatheWise home">
-          <span className="brand-mark" aria-hidden="true">◌</span>
+          <BrandMark />
           <span>BreatheWise</span>
         </a>
         <div className="header-tools">
@@ -223,7 +224,7 @@ export function BreatheWisePlanner() {
       <main className="app-shell" id="main">
         <section className="hero" aria-labelledby="hero-title">
           <p className="eyebrow">Today’s clean-air plan</p>
-          <h1 id="hero-title">Small choices, clearer context.</h1>
+          <h1 id="hero-title">Small choices, clearer context</h1>
           <p>
             A household plan for a smoggy day: lower-exposure and lower-emission choices matched to your city
             and routine, with what each one changes.
@@ -243,7 +244,7 @@ export function BreatheWisePlanner() {
           />
           <article className="trust-card">
             <p className="eyebrow">Truth and safety contract</p>
-            <h2>Never blur the data.</h2>
+            <h2>Never blur the data</h2>
             <ul>
               <li>Model forecasts and demo fixtures are labelled differently and never mixed up.</li>
               <li>Exposure and household-emissions effects are explained separately.</li>

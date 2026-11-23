@@ -24,7 +24,6 @@
 :root,
 :root[data-theme="light"] {
   color-scheme: light;
-  --on-brand: #fdfbf7;
   --ink: #1f1b16;
   --muted: #6b6256;
   --paper: #f7f4ee;
@@ -51,15 +50,12 @@
   --hero-fg: #1f1b16;
   --hero-muted: #5e554a;
   --hero-border: rgba(31, 27, 22, 0.12);
-  --brand-a: #0f766e;
-  --brand-b: #0f766e;
   --shadow: 0 1px 2px rgba(31, 27, 22, 0.05);
 }
 
 /* Dark: graphite, off-white primary action, one sky-blue accent. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --on-brand: #0b1220;
   --ink: #ededed;
   --muted: #8f8f95;
   --paper: #141415;
@@ -86,8 +82,6 @@
   --hero-fg: #ededed;
   --hero-muted: #a1a1a6;
   --hero-border: rgba(237, 237, 237, 0.1);
-  --brand-a: #7ab8f5;
-  --brand-b: #7ab8f5;
   --shadow: none;
 }
 
@@ -165,22 +159,27 @@ a:focus-visible {
   align-items: center;
   color: var(--ink);
   display: inline-flex;
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   font-weight: var(--w-strong);
-  gap: 9px;
+  gap: 8px;
   text-decoration: none;
+  letter-spacing: -0.01em;
 }
 
-.brand-mark {
-  align-items: center;
-  background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
-  border-radius: var(--r-mark);
-  color: var(--on-brand);
-  display: inline-flex;
-  font-size: 1.5rem;
-  height: 30px;
-  justify-content: center;
-  width: 30px;
+.brand svg {
+  color: var(--blue);
+  fill: currentColor;
+  flex: none;
+  height: 24px;
+  width: 24px;
+}
+
+.brand svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.75;
 }
 
 .challenge-label,
@@ -196,7 +195,7 @@ a:focus-visible {
 
 .hero {
   max-width: 720px;
-  padding: 48px 0 38px;
+  padding: 48px 0 40px;
 }
 
 .hero h1,
@@ -206,7 +205,7 @@ a:focus-visible {
   font-size: clamp(2rem, 4vw, 3.8rem);
   letter-spacing: var(--track-display);
   line-height: 0.98;
-  margin: 12px 0 18px;
+  margin: 12px 0 16px;
 }
 
 .hero > p:last-child,
@@ -229,7 +228,7 @@ a:focus-visible {
 
 .setup-panel {
   display: grid;
-  gap: 38px;
+  gap: 40px;
   grid-template-columns: minmax(230px, 0.75fr) minmax(390px, 1.25fr);
   padding: 32px;
 }
@@ -241,12 +240,12 @@ a:focus-visible {
 .setup-panel h2,
 .section-heading h2,
 .assistant-section h2 {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .setup-controls {
   display: grid;
-  gap: 22px;
+  gap: 24px;
 }
 
 fieldset {
@@ -257,12 +256,12 @@ fieldset {
 
 legend {
   font-weight: var(--w-strong);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .choice-grid {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   grid-template-columns: repeat(3, 1fr);
 }
 
@@ -274,7 +273,7 @@ legend {
   display: block;
   font-weight: var(--w-medium);
   min-height: 68px;
-  padding: 14px;
+  padding: 16px;
 }
 
 .choice.active {
@@ -301,7 +300,7 @@ legend {
   display: flex;
   font-size: 0.94rem;
   font-weight: var(--w-medium);
-  gap: 10px;
+  gap: 8px;
 }
 
 .toggle-row input {
@@ -312,7 +311,7 @@ legend {
 
 .dashboard-grid {
   display: grid;
-  gap: 22px;
+  gap: 24px;
   grid-template-columns: 1.35fr 0.65fr;
   margin-top: 24px;
 }
@@ -331,7 +330,7 @@ legend {
   font-size: 0.76rem;
   font-weight: var(--w-strong);
   margin-bottom: 24px;
-  padding: 7px 10px;
+  padding: 8px 12px;
 }
 
 .model-banner {
@@ -342,7 +341,7 @@ legend {
   font-size: 0.76rem;
   font-weight: var(--w-strong);
   margin-bottom: 24px;
-  padding: 7px 10px;
+  padding: 8px 12px;
 }
 
 .status-heading {
@@ -355,7 +354,7 @@ legend {
 .trust-card h2 {
   font-size: 2rem;
   letter-spacing: -0.04em;
-  margin: 7px 0;
+  margin: 8px 0;
 }
 
 .status-heading p,
@@ -370,14 +369,14 @@ legend {
 .source-list {
   border-top: 1px solid var(--line);
   display: grid;
-  gap: 13px;
-  margin: 22px 0 12px;
+  gap: 12px;
+  margin: 24px 0 12px;
   padding-top: 20px;
 }
 
 .source-list div {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   grid-template-columns: 110px 1fr;
 }
 
@@ -399,8 +398,8 @@ legend {
   color: var(--on-accent);
   cursor: pointer;
   font-weight: var(--w-strong);
-  margin-top: 10px;
-  padding: 11px 14px;
+  margin-top: 12px;
+  padding: 12px 16px;
 }
 
 .model-button:disabled {
@@ -428,7 +427,7 @@ legend {
 
 .trust-card ul {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   margin: 24px 0 0;
   padding-left: 20px;
 }
@@ -468,7 +467,7 @@ legend {
   display: flex;
   flex-direction: column;
   min-height: 320px;
-  padding: 22px;
+  padding: 24px;
 }
 
 .recommendation-topline {
@@ -490,21 +489,21 @@ legend {
   font-size: 1.26rem;
   letter-spacing: -0.025em;
   line-height: 1.16;
-  margin: 21px 0 14px;
+  margin: 20px 0 12px;
 }
 
 .recommendation-card p {
   color: var(--body);
   font-size: 0.92rem;
   line-height: 1.5;
-  margin: 0 0 11px;
+  margin: 0 0 12px;
 }
 
 .recommendation-card .caveat {
   border-top: 1px solid var(--line);
   font-size: 0.82rem;
   margin-top: auto;
-  padding-top: 13px;
+  padding-top: 12px;
 }
 
 .assistant-section {
@@ -527,7 +526,7 @@ legend {
 .question-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .question-button {
@@ -538,7 +537,7 @@ legend {
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: var(--w-medium);
-  padding: 11px 14px;
+  padding: 12px 16px;
   text-align: left;
 }
 
@@ -556,7 +555,7 @@ legend {
   color: var(--on-ink);
   cursor: pointer;
   font-weight: var(--w-strong);
-  padding: 11px 14px;
+  padding: 12px 16px;
 }
 
 .ai-button:disabled {
@@ -606,8 +605,8 @@ legend {
   .site-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 10px;
-    padding: 18px 16px;
+    gap: 8px;
+    padding: 16px;
   }
 
   .header-tools {
@@ -615,7 +614,7 @@ legend {
   }
 
   .hero {
-    padding: 34px 0 28px;
+    padding: 32px 0 28px;
   }
 
   .setup-panel,
@@ -623,7 +622,7 @@ legend {
   .trust-card,
   .assistant-section {
     border-radius: var(--r-panel-sm);
-    padding: 22px;
+    padding: 24px;
   }
 
   .source-list div {
@@ -633,7 +632,7 @@ legend {
 
 .field {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .field label {
@@ -647,7 +646,7 @@ legend {
   border-radius: var(--r-control);
   color: var(--ink);
   min-height: 44px;
-  padding: 10px 12px;
+  padding: 12px;
   width: 100%;
 }
 
@@ -662,7 +661,7 @@ legend {
   border-radius: var(--r-control);
   color: var(--warn-fg);
   font-weight: var(--w-medium);
-  padding: 10px 12px;
+  padding: 12px;
 }
 
 ol.recommendation-grid {
@@ -683,14 +682,14 @@ ol.recommendation-grid {
   color: var(--body);
   font-size: 0.9rem;
   line-height: 1.5;
-  margin: 0 0 11px;
-  padding-left: 18px;
+  margin: 0 0 12px;
+  padding-left: 20px;
 }
 
 .why-for-you {
   background: var(--blue-soft);
   border-radius: var(--r-control);
-  padding: 8px 10px;
+  padding: 8px 12px;
 }
 
 .more-options {
@@ -701,7 +700,7 @@ ol.recommendation-grid {
   cursor: pointer;
   font-weight: var(--w-strong);
   min-height: 44px;
-  padding: 10px 0;
+  padding: 12px 0;
 }
 
 .more-options li {
@@ -732,8 +731,8 @@ ol.recommendation-grid {
 
 .toggle-row input,
 .choice input {
-  height: 22px;
-  width: 22px;
+  height: 24px;
+  width: 24px;
 }
 
 .extra-section {
@@ -741,7 +740,7 @@ ol.recommendation-grid {
   border: 1px solid var(--line);
   border-radius: var(--r-panel);
   display: grid;
-  gap: 14px;
+  gap: 16px;
   margin-top: 40px;
   padding: 28px;
 }
@@ -764,7 +763,7 @@ ol.recommendation-grid {
 
 .estimate-grid {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   grid-template-columns: repeat(3, 1fr);
 }
 
@@ -774,7 +773,7 @@ ol.recommendation-grid {
   border-radius: var(--r-control);
   color: var(--ink);
   min-height: 44px;
-  padding: 10px 12px;
+  padding: 12px;
   width: 100%;
 }
 
@@ -804,7 +803,7 @@ ol.recommendation-grid {
 @media (max-width: 560px) {
   .extra-section {
     border-radius: var(--r-panel-sm);
-    padding: 22px;
+    padding: 24px;
   }
 }
 
@@ -813,7 +812,7 @@ ol.recommendation-grid {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
+  gap: 8px 16px;
   justify-content: flex-end;
 }
 
@@ -829,7 +828,7 @@ ol.recommendation-grid {
   font-weight: var(--w-medium);
   gap: 8px;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 16px;
 }
 
 .theme-toggle:hover {
@@ -842,12 +841,12 @@ ol.recommendation-grid {
 
 .theme-toggle svg {
   fill: none;
-  height: 18px;
+  height: 16px;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.5;
-  width: 18px;
+  width: 16px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
