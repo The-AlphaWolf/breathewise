@@ -40,7 +40,9 @@ export async function fetchLiveAir(target: LiveTarget): Promise<AirSnapshot> {
   let upstream: Response;
   try {
     upstream = await fetch("https://air-quality-api.open-meteo.com/v1/air-quality?" + query, {
-      next: { revalidate: 300 },
+      // Fresh on every call. The route response is cached for 5 min by the CDN (Cache-Control);
+      // Next's own data cache is stale-while-revalidate and served day-old values after idle gaps.
+      cache: "no-store",
       signal: AbortSignal.timeout(8_000),
     });
   } catch {

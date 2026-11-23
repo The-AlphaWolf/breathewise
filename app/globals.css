@@ -1,3 +1,26 @@
+/* Shape and type tokens. Defaults describe the original look; the quiet themes override them. */
+:root {
+  --font-ui: Arial, Helvetica, sans-serif;
+  --w-heading: 700;
+  --w-strong: 800;
+  --w-medium: 700;
+  --r-panel: 24px;
+  --r-panel-sm: 18px;
+  --r-card: 20px;
+  --r-choice: 14px;
+  --r-control: 10px;
+  --r-pill: 999px;
+  --r-mark: 50%;
+  --label-size: 0.78rem;
+  --label-weight: 800;
+  --label-tracking: 0.08em;
+  --label-transform: uppercase;
+  --track-display: -0.055em;
+  --badge-pad: 6px 9px;
+  --badge-bg: var(--blue-soft);
+  --on-brand: white;
+}
+
 :root,
 :root[data-theme="sky"] {
   color-scheme: light;
@@ -168,6 +191,117 @@
   --shadow: none;
 }
 
+/* Field notes: unslopped, warm paper. One teal accent, hairlines, no gradients or glows. */
+:root[data-theme="paper"] {
+  color-scheme: light;
+  --font-ui: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --w-heading: 500;
+  --w-strong: 500;
+  --w-medium: 500;
+  --r-panel: 16px;
+  --r-panel-sm: 14px;
+  --r-card: 14px;
+  --r-choice: 10px;
+  --r-control: 8px;
+  --r-pill: 8px;
+  --r-mark: 8px;
+  --label-size: 0.8125rem;
+  --label-weight: 500;
+  --label-tracking: 0;
+  --label-transform: none;
+  --track-display: -0.03em;
+  --badge-pad: 0;
+  --badge-bg: transparent;
+  --on-brand: #fdfbf7;
+  --ink: #1f1b16;
+  --muted: #6b6256;
+  --paper: #f7f4ee;
+  --surface: #fdfbf7;
+  --line: rgba(31, 27, 22, 0.12);
+  --blue: #0f766e;
+  --blue-soft: #efe9df;
+  --teal: #0f766e;
+  --amber: #a16207;
+  --rose: #b42318;
+  --body: #5e554a;
+  --field: #fdfbf7;
+  --on-accent: #fdfbf7;
+  --on-ink: #fdfbf7;
+  --warn-bg: #f3e6c4;
+  --warn-fg: #6b4a0a;
+  --ok-bg: #dcebe4;
+  --ok-fg: #14532d;
+  --danger: #b42318;
+  --focus: #1d4ed8;
+  --answer-bg: #efe9df;
+  --hero-a: #efe9df;
+  --hero-b: #efe9df;
+  --hero-fg: #1f1b16;
+  --hero-muted: #5e554a;
+  --hero-border: rgba(31, 27, 22, 0.12);
+  --brand-a: #0f766e;
+  --brand-b: #0f766e;
+  --shadow: 0 1px 2px rgba(31, 27, 22, 0.05);
+}
+
+/* Station: unslopped, graphite. Off-white primary action, one sky-blue accent. */
+:root[data-theme="station"] {
+  color-scheme: dark;
+  --font-ui: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --w-heading: 500;
+  --w-strong: 500;
+  --w-medium: 500;
+  --r-panel: 16px;
+  --r-panel-sm: 14px;
+  --r-card: 14px;
+  --r-choice: 10px;
+  --r-control: 8px;
+  --r-pill: 8px;
+  --r-mark: 8px;
+  --label-size: 0.8125rem;
+  --label-weight: 500;
+  --label-tracking: 0;
+  --label-transform: none;
+  --track-display: -0.03em;
+  --badge-pad: 0;
+  --badge-bg: transparent;
+  --on-brand: #0b1220;
+  --ink: #ededed;
+  --muted: #8f8f95;
+  --paper: #141415;
+  --surface: #19191b;
+  --line: rgba(237, 237, 237, 0.1);
+  --blue: #7ab8f5;
+  --blue-soft: #232325;
+  --teal: #5ec2b7;
+  --amber: #e0b04f;
+  --rose: #ea7a80;
+  --body: #a1a1a6;
+  --field: #0f0f10;
+  --on-accent: #0b1220;
+  --on-ink: #141415;
+  --warn-bg: #3a2f14;
+  --warn-fg: #f0d28a;
+  --ok-bg: #17352d;
+  --ok-fg: #8fe0bf;
+  --danger: #f08a8d;
+  --focus: #f0b45a;
+  --answer-bg: #1e1e20;
+  --hero-a: #19191b;
+  --hero-b: #19191b;
+  --hero-fg: #ededed;
+  --hero-muted: #a1a1a6;
+  --hero-border: rgba(237, 237, 237, 0.1);
+  --brand-a: #7ab8f5;
+  --brand-b: #7ab8f5;
+  --shadow: none;
+}
+
+:root[data-theme="paper"] strong,
+:root[data-theme="station"] strong {
+  color: var(--ink);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -181,8 +315,24 @@
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-ui);
   margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: var(--w-heading);
+}
+
+strong {
+  font-weight: var(--w-medium);
+}
+
+.status-summary,
+.source-list dd,
+.estimate-result {
+  font-variant-numeric: tabular-nums;
 }
 
 button,
@@ -215,7 +365,7 @@ a:focus-visible {
   margin: 0 auto;
   max-width: 1180px;
   min-height: 76px;
-  padding: 0 24px;
+  padding: 12px 24px;
 }
 
 .brand {
@@ -223,7 +373,7 @@ a:focus-visible {
   color: var(--ink);
   display: inline-flex;
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: var(--w-strong);
   gap: 9px;
   text-decoration: none;
 }
@@ -231,8 +381,8 @@ a:focus-visible {
 .brand-mark {
   align-items: center;
   background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
-  border-radius: 50%;
-  color: white;
+  border-radius: var(--r-mark);
+  color: var(--on-brand);
   display: inline-flex;
   font-size: 1.5rem;
   height: 30px;
@@ -244,11 +394,11 @@ a:focus-visible {
 .eyebrow,
 .answer-label {
   color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
   margin: 0;
-  text-transform: uppercase;
+  text-transform: var(--label-transform);
 }
 
 .hero {
@@ -261,7 +411,7 @@ a:focus-visible {
 .setup-panel h2,
 .assistant-section h2 {
   font-size: clamp(2rem, 4vw, 3.8rem);
-  letter-spacing: -0.055em;
+  letter-spacing: var(--track-display);
   line-height: 0.98;
   margin: 12px 0 18px;
 }
@@ -280,7 +430,7 @@ a:focus-visible {
 .assistant-section {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: var(--r-panel);
   box-shadow: var(--shadow);
 }
 
@@ -313,7 +463,7 @@ fieldset {
 }
 
 legend {
-  font-weight: 800;
+  font-weight: var(--w-strong);
   margin-bottom: 10px;
 }
 
@@ -325,11 +475,11 @@ legend {
 
 .choice {
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-choice);
   color: var(--muted);
   cursor: pointer;
   display: block;
-  font-weight: 700;
+  font-weight: var(--w-medium);
   min-height: 68px;
   padding: 14px;
 }
@@ -357,7 +507,7 @@ legend {
   cursor: pointer;
   display: flex;
   font-size: 0.94rem;
-  font-weight: 700;
+  font-weight: var(--w-medium);
   gap: 10px;
 }
 
@@ -382,22 +532,22 @@ legend {
 
 .demo-banner {
   background: var(--warn-bg);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: var(--warn-fg);
   display: inline-block;
   font-size: 0.76rem;
-  font-weight: 800;
+  font-weight: var(--w-strong);
   margin-bottom: 24px;
   padding: 7px 10px;
 }
 
 .model-banner {
   background: var(--ok-bg);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: var(--ok-fg);
   display: inline-block;
   font-size: 0.76rem;
-  font-weight: 800;
+  font-weight: var(--w-strong);
   margin-bottom: 24px;
   padding: 7px 10px;
 }
@@ -445,17 +595,17 @@ legend {
 
 .source-list dd {
   font-size: 0.92rem;
-  font-weight: 700;
+  font-weight: var(--w-medium);
   margin: 0;
 }
 
 .model-button {
   background: var(--blue);
   border: 1px solid var(--blue);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   color: var(--on-accent);
   cursor: pointer;
-  font-weight: 800;
+  font-weight: var(--w-strong);
   margin-top: 10px;
   padding: 11px 14px;
 }
@@ -521,7 +671,7 @@ legend {
 .recommendation-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--r-card);
   display: flex;
   flex-direction: column;
   min-height: 320px;
@@ -535,12 +685,12 @@ legend {
 }
 
 .impact-badge {
-  background: var(--blue-soft);
-  border-radius: 999px;
+  background: var(--badge-bg);
+  border-radius: var(--r-pill);
   color: var(--blue);
   font-size: 0.72rem;
-  font-weight: 800;
-  padding: 6px 9px;
+  font-weight: var(--w-strong);
+  padding: var(--badge-pad);
 }
 
 .recommendation-card h3 {
@@ -590,11 +740,11 @@ legend {
 .question-button {
   background: var(--field);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: var(--ink);
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: var(--w-medium);
   padding: 11px 14px;
   text-align: left;
 }
@@ -609,10 +759,10 @@ legend {
   align-self: start;
   background: var(--ink);
   border: 1px solid var(--ink);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   color: var(--on-ink);
   cursor: pointer;
-  font-weight: 800;
+  font-weight: var(--w-strong);
   padding: 11px 14px;
 }
 
@@ -679,7 +829,7 @@ legend {
   .status-card,
   .trust-card,
   .assistant-section {
-    border-radius: 18px;
+    border-radius: var(--r-panel-sm);
     padding: 22px;
   }
 
@@ -694,14 +844,14 @@ legend {
 }
 
 .field label {
-  font-weight: 800;
+  font-weight: var(--w-strong);
 }
 
 .field select,
 .field textarea {
   background: var(--field);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   color: var(--ink);
   min-height: 44px;
   padding: 10px 12px;
@@ -716,9 +866,9 @@ legend {
 
 .stale-banner {
   background: var(--warn-bg);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   color: var(--warn-fg);
-  font-weight: 700;
+  font-weight: var(--w-medium);
   padding: 10px 12px;
 }
 
@@ -746,7 +896,7 @@ ol.recommendation-grid {
 
 .why-for-you {
   background: var(--blue-soft);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   padding: 8px 10px;
 }
 
@@ -756,7 +906,7 @@ ol.recommendation-grid {
 
 .more-options summary {
   cursor: pointer;
-  font-weight: 800;
+  font-weight: var(--w-strong);
   min-height: 44px;
   padding: 10px 0;
 }
@@ -796,7 +946,7 @@ ol.recommendation-grid {
 .extra-section {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: var(--r-panel);
   display: grid;
   gap: 14px;
   margin-top: 40px;
@@ -828,7 +978,7 @@ ol.recommendation-grid {
 .field input[type="number"] {
   background: var(--field);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--r-control);
   color: var(--ink);
   min-height: 44px;
   padding: 10px 12px;
@@ -860,7 +1010,7 @@ ol.recommendation-grid {
 
 @media (max-width: 560px) {
   .extra-section {
-    border-radius: 18px;
+    border-radius: var(--r-panel-sm);
     padding: 22px;
   }
 }
@@ -897,12 +1047,12 @@ ol.recommendation-grid {
   align-items: center;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: var(--ink);
   cursor: pointer;
   display: inline-flex;
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: var(--w-medium);
   gap: 8px;
   min-height: 44px;
   min-width: 44px;

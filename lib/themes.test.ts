@@ -36,9 +36,21 @@ const PAIRS: [string, string, number][] = [
   ["focus", "paper", 3], ["focus", "surface", 3],
 ];
 
-test("every theme defines the same token set as the default theme", () => {
-  const base = Object.keys(tokens("sky")).sort();
-  for (const { id } of THEMES) assert.deepEqual(Object.keys(tokens(id)).sort(), base, id);
+// Shape and type tokens have defaults in :root; only the quiet themes override them.
+const SHAPE = /^(w|r|label|track|badge)-|^font-ui$|^on-brand$/;
+const colourKeys = (id: string) => Object.keys(tokens(id)).filter((k) => !SHAPE.test(k)).sort();
+
+test("every theme defines the same colour token set as the default theme", () => {
+  const base = colourKeys("sky");
+  for (const { id } of THEMES) assert.deepEqual(colourKeys(id), base, id);
+});
+
+test("shape and type tokens used by the stylesheet all have a default in :root", () => {
+  const root = /:root \{([^}]*)\}/.exec(css);
+  assert.ok(root);
+  const defined = new Set([...root[1].matchAll(/--([a-z0-9-]+):/g)].map((m) => m[1]));
+  const used = new Set([...css.matchAll(/var\(--((?:w|r|label|track|badge)-[a-z-]+|font-ui|on-brand)\)/g)].map((m) => m[1]));
+  for (const key of used) assert.ok(defined.has(key), `--${key} has no default`);
 });
 
 for (const { id } of THEMES) {
