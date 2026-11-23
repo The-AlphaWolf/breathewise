@@ -35,7 +35,7 @@ The plan is computed in the browser by the same pure code the server uses to val
 - One structured call (`generateText` + `Output.object`, Gemini via `@ai-sdk/google`); no tool loop.
 - The model sees only city, AQI category, better window, household flags, approved actions and the question (inside a JSON string, marked untrusted). No name, address, coordinates or child details.
 - Server-side validation (`validateAiOutput`): zod schema, 3 distinct ids that are all approved, at least one indoor and one emissions action, per-action ids inside the ranking, length caps, and no URLs, HTML or markdown links. Any failure returns an error and the UI falls back to the rules-based plan.
-- Request body ≤ 4 KB, question ≤ 300 characters, 10 s model timeout, low temperature, in-memory per-IP rate limit (10 requests/min per server instance).
+- Request body ≤ 4 KB, question ≤ 300 characters, 12 s model timeout, low temperature, in-memory per-IP rate limit (10 requests/min per server instance).
 
 ## Data sources, labels, attribution
 
@@ -67,9 +67,12 @@ Header outside `main`, one `h1`, labelled form controls with native fieldsets, `
 ```bash
 npm ci
 npm test          # node:test, no extra dependencies
+npm run lint      # Biome (recommended rules)
 npm run typecheck
 npm run build
 ```
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, tests and build on every push and pull request.
 
 Covered: AQI boundaries and extra caution, rules gating/ranking and the top-3 invariant over every context × level × window combination, better-window logic, timestamp/freshness, demo fixtures, coordinate validation, the emissions estimator, the community message, and the AI validator (unknown ids, duplicates, coverage, length caps, URL/HTML rejection, injection question).
 

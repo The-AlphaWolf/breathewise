@@ -13,7 +13,7 @@ const MIN_GAIN = 0.2;
 export const windowRange = (w: BetterWindow): string => `${w.start.slice(11)}–${w.end.slice(11)}`;
 
 function plusOneHour(time: string): string {
-  return new Date(Date.parse(time + ":00Z") + 3_600_000).toISOString().slice(0, 16);
+  return new Date(Date.parse(`${time}:00Z`) + 3_600_000).toISOString().slice(0, 16);
 }
 
 /**

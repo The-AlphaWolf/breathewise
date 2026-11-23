@@ -40,7 +40,7 @@ export function formatIst(timestamp: string): string {
   return `${Number(day)} ${MONTHS[Number(month) - 1]}, ${time.slice(0, 5)} IST`;
 }
 
-const sourceMs = (timestamp: string) => Date.parse(timestamp + ":00+05:30");
+const sourceMs = (timestamp: string) => Date.parse(`${timestamp}:00+05:30`);
 
 export function minutesAgo(sourceTimestamp: string, nowMs: number): number {
   return Math.round((nowMs - sourceMs(sourceTimestamp)) / 60_000);

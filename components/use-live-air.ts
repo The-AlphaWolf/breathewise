@@ -27,6 +27,7 @@ export function useLiveAir(enabled: boolean, url: string) {
   const [now, setNow] = useState<number | null>(null);
   const lastFetched = useRef<number | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `reload` is a deliberate re-run trigger for manual and automatic refresh
   useEffect(() => {
     if (!enabled) return;
     const controller = new AbortController();

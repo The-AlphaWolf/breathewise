@@ -66,8 +66,8 @@ test("top 3 always include one indoor and one emissions action", () => {
         const label = JSON.stringify({ ctx, level, w: w !== null });
         assert.equal(top.length, 3, label);
         assert.equal(new Set(top.map((a) => a.id)).size, 3, label);
-        assert.ok(top.some((a) => a.impact.indoor !== undefined), "indoor " + label);
-        assert.ok(top.some((a) => a.impact.emissions !== undefined), "emissions " + label);
+        assert.ok(top.some((a) => a.impact.indoor !== undefined), `indoor ${label}`);
+        assert.ok(top.some((a) => a.impact.emissions !== undefined), `emissions ${label}`);
       }
     }
   }

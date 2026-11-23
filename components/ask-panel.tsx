@@ -34,7 +34,8 @@ export function AskPanel({ text, questionId, onQuestion, onAsk, view }: Props) {
         </p>
       </div>
       <div className="assistant-panel">
-        <div className="question-list" role="group" aria-label="Suggested questions">
+        <fieldset className="question-list">
+          <legend className="visually-hidden">Suggested questions</legend>
           {QUESTIONS.map((q) => (
             <button
               key={q.id}
@@ -46,7 +47,7 @@ export function AskPanel({ text, questionId, onQuestion, onAsk, view }: Props) {
               {q.text}
             </button>
           ))}
-        </div>
+        </fieldset>
         <div className="field">
           <label htmlFor="question">Or ask your own question (optional)</label>
           <textarea

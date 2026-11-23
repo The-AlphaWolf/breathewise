@@ -2,7 +2,7 @@ import { google } from "@ai-sdk/google";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { aiOutputSchema, buildPrompt, MAX_QUESTION_LENGTH, SYSTEM_PROMPT, validateAiOutput } from "../../../lib/ai.ts";
-import { type AirSnapshot } from "../../../lib/air.ts";
+import type { AirSnapshot } from "../../../lib/air.ts";
 import { AirError, fetchLiveAir } from "../../../lib/air-server.ts";
 import { aqiLevel, LEVEL_LABELS } from "../../../lib/aqi.ts";
 import { CITY_IDS } from "../../../lib/cities.ts";
